@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/logo.png";
 const navLinks = [{
   name: "About",
   href: "#about"
@@ -30,8 +31,8 @@ const Navbar = () => {
   }, []);
   return <nav className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6", isScrolled ? "py-4" : "py-6")}>
       <div className={cn("max-w-6xl mx-auto flex items-center justify-between px-6 py-3 rounded-2xl transition-all duration-300", isScrolled ? "bg-background/80 backdrop-blur-xl shadow-md border border-border/50" : "")}>
-        <a className="text-xl font-bold gradient-text" href="instagram.com">
-          AM
+        <a href="#" className="flex items-center">
+          <img src={logo} alt="arrows.in logo" className="h-8 w-auto" />
         </a>
 
         {/* Desktop nav */}
