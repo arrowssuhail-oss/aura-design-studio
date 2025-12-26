@@ -1,4 +1,5 @@
 import { ArrowUpRight, BarChart3, Palette, ShoppingCart, Smartphone } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const projects = [
   {
@@ -8,6 +9,7 @@ const projects = [
     color: "from-accent/40 to-accent/10",
     icon: BarChart3,
     shapes: ["rounded-lg", "rounded-full", "rounded-md"],
+    link: "/projects/fintech-dashboard",
   },
   {
     id: 2,
@@ -16,6 +18,7 @@ const projects = [
     color: "from-rose-500/30 to-rose-500/5",
     icon: Palette,
     shapes: ["rounded-full", "rounded-lg", "rounded-full"],
+    link: "/projects/brand-identity",
   },
   {
     id: 3,
@@ -24,6 +27,7 @@ const projects = [
     color: "from-amber-500/30 to-amber-500/5",
     icon: ShoppingCart,
     shapes: ["rounded-md", "rounded-full", "rounded-lg"],
+    link: "/projects/ecommerce-platform",
   },
   {
     id: 4,
@@ -32,6 +36,7 @@ const projects = [
     color: "from-violet-500/30 to-violet-500/5",
     icon: Smartphone,
     shapes: ["rounded-2xl", "rounded-lg", "rounded-full"],
+    link: "/projects/mobile-app-design",
   },
 ];
 
@@ -53,9 +58,10 @@ const ProjectsSection = () => {
         
         <div className="grid md:grid-cols-2 gap-6">
           {projects.map((project, index) => (
-            <div
+            <Link
               key={project.id}
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift"
+              to={project.link}
+              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift block"
             >
               {/* Background gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${project.color}`} />
@@ -91,7 +97,7 @@ const ProjectsSection = () => {
               
               {/* Hover gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
+            </Link>
           ))}
         </div>
       </div>
