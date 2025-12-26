@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.png";
+import { Link } from "react-router-dom";
 const navLinks = [{
   name: "About",
   href: "#about"
@@ -40,8 +41,8 @@ const Navbar = () => {
         {navLinks.map(link => <a key={link.name} href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
           {link.name}
         </a>)}
-        <Button variant="accent" size="sm" asChild>
-          <a href="#contact">Let's Talk</a>
+        <Button variant="accent" size="sm">
+          Let's Talk
         </Button>
       </div>
 
@@ -57,8 +58,8 @@ const Navbar = () => {
         {navLinks.map(link => <a key={link.name} href={link.href} className="text-foreground py-2 border-b border-border/50 last:border-0" onClick={() => setIsMobileMenuOpen(false)}>
           {link.name}
         </a>)}
-        <Button variant="accent" className="mt-2" asChild>
-          <a href="#contact">Let's Talk</a>
+        <Button variant="accent" className="mt-2">
+          Let's Talk
         </Button>
       </div>
     </div>}

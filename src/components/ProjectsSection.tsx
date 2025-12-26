@@ -66,19 +66,6 @@ const ProjectsSection = () => {
               {/* Background gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${project.color}`} />
 
-              {/* Animated visual elements */}
-              <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-                {/* Floating shapes */}
-                <div className={`absolute w-32 h-32 ${project.shapes[0]} bg-foreground/5 animate-float`} style={{ top: '20%', left: '60%', animationDelay: '0s' }} />
-                <div className={`absolute w-20 h-20 ${project.shapes[1]} bg-foreground/10 animate-float`} style={{ top: '50%', left: '70%', animationDelay: '0.5s' }} />
-                <div className={`absolute w-16 h-16 ${project.shapes[2]} bg-foreground/5 animate-float`} style={{ top: '30%', left: '50%', animationDelay: '1s' }} />
-
-                {/* Central icon */}
-                <div className="relative z-10 w-24 h-24 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                  <project.icon className="w-12 h-12 text-foreground/60 group-hover:text-foreground transition-colors duration-300" />
-                </div>
-              </div>
-
               {/* Content overlay */}
               <div className="absolute inset-0 p-8 flex flex-col justify-between z-20">
                 <div className="flex justify-between items-start">
