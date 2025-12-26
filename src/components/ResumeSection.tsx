@@ -3,35 +3,30 @@ import { Download, Briefcase, GraduationCap } from "lucide-react";
 
 const experience = [
   {
-    title: "Senior Product Designer",
-    company: "TechCorp Inc.",
-    period: "2022 — Present",
-    description: "Leading design for core product features and mentoring junior designers.",
-  },
-  {
-    title: "UI/UX Designer",
+    title: "Web Designer",
     company: "Creative Studio",
-    period: "2020 — 2022",
+    period: "2025 — 2025",
     description: "Designed digital experiences for clients across fintech and healthcare.",
   },
   {
-    title: "Junior Designer",
-    company: "Design Agency",
-    period: "2019 — 2020",
+    title: "Graphic Designer",
+    company: "SkillBee",
+    period: "2025 — Present",
+    description: "Leading design for core product features and mentoring junior designers.",
+  },
+  {
+    title: "Freelance",
+    company: "Arrows.in",
+    period: "2023 — Present",
     description: "Started my design career creating brand identities and web designs.",
   },
 ];
 
 const education = [
   {
-    title: "Master's in Digital Design",
-    institution: "Stanford University",
-    period: "2017 — 2019",
-  },
-  {
-    title: "Bachelor's in Visual Arts",
-    institution: "UCLA",
-    period: "2013 — 2017",
+    title: "Bachelor's in Commerce",
+    institution: "Calicut University",
+    period: "2025 — 2029",
   },
 ];
 

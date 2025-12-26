@@ -1,13 +1,13 @@
-import { ArrowLeft, ShoppingCart, CheckCircle } from "lucide-react";
+import { ArrowLeft, Palette, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const EcommercePlatform = () => {
+const BrandIdentity = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6">
         <div className="max-w-6xl mx-auto">
@@ -15,19 +15,19 @@ const EcommercePlatform = () => {
             <ArrowLeft className="w-4 h-4" />
             Back to Projects
           </Link>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/20 flex items-center justify-center">
-              <ShoppingCart className="w-8 h-8 text-amber-500" />
+            <div className="w-16 h-16 rounded-2xl bg-rose-500/20 flex items-center justify-center">
+              <Palette className="w-8 h-8 text-rose-500" />
             </div>
             <div>
-              <span className="text-amber-500 text-sm font-medium uppercase tracking-widest">Web Design</span>
-              <h1 className="text-4xl md:text-6xl font-bold mt-2">E-commerce Platform</h1>
+              <span className="text-rose-500 text-sm font-medium uppercase tracking-widest">Graphic Design</span>
+              <h1 className="text-4xl md:text-6xl font-bold mt-2">Custom & Unique Identity</h1>
             </div>
           </div>
-          
+
           <p className="text-xl text-muted-foreground max-w-2xl">
-            A premium e-commerce experience designed to maximize conversions while delivering an elegant, seamless shopping journey from browse to checkout.
+            A complete brand identity overhaul for a modern tech startup, encompassing logo design, color systems, typography, and comprehensive brand guidelines.
           </p>
         </div>
       </section>
@@ -35,11 +35,11 @@ const EcommercePlatform = () => {
       {/* Project Visual */}
       <section className="px-6 pb-16">
         <div className="max-w-6xl mx-auto">
-          <div className="aspect-video rounded-3xl bg-gradient-to-br from-amber-500/30 to-amber-500/5 flex items-center justify-center overflow-hidden relative">
-            <div className="absolute w-52 h-52 rounded-md bg-foreground/5 animate-float" style={{ top: '12%', left: '58%' }} />
-            <div className="absolute w-32 h-32 rounded-full bg-foreground/10 animate-float" style={{ top: '48%', left: '22%', animationDelay: '0.5s' }} />
-            <div className="absolute w-28 h-28 rounded-lg bg-foreground/5 animate-float" style={{ top: '28%', left: '42%', animationDelay: '1s' }} />
-            <ShoppingCart className="w-32 h-32 text-foreground/40" />
+          <div className="aspect-video rounded-3xl bg-gradient-to-br from-rose-500/30 to-rose-500/5 flex items-center justify-center overflow-hidden relative">
+            <div className="absolute w-48 h-48 rounded-full bg-foreground/5 animate-float" style={{ top: '15%', left: '65%' }} />
+            <div className="absolute w-36 h-36 rounded-lg bg-foreground/10 animate-float" style={{ top: '55%', left: '15%', animationDelay: '0.5s' }} />
+            <div className="absolute w-24 h-24 rounded-full bg-foreground/5 animate-float" style={{ top: '25%', left: '35%', animationDelay: '1s' }} />
+            <Palette className="w-32 h-32 text-foreground/40" />
           </div>
         </div>
       </section>
@@ -50,33 +50,33 @@ const EcommercePlatform = () => {
           <div>
             <h2 className="text-2xl font-bold mb-6">The Challenge</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Design a high-converting e-commerce platform that balances aesthetic appeal with functionality, supporting thousands of products while maintaining fast load times and intuitive navigation.
+              Establish a unified visual language that communicates innovation through layout and color, ensuring consistent graphic application across all brand touchpoints.
             </p>
           </div>
           <div>
             <h2 className="text-2xl font-bold mb-6">The Solution</h2>
             <p className="text-muted-foreground leading-relaxed">
-              A minimalist design approach with strategic use of whitespace, intuitive filtering, quick-view modals, and a streamlined checkout flow that reduced cart abandonment by 35%.
+              A geometric design framework utilizing a high-contrast color palette and structured typography to create a recognizable and scalable aesthetic for digital interfaces and physical media.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Key Features */}
+      {/* Deliverables */}
       <section className="px-6 py-16 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12">Key Features</h2>
+          <h2 className="text-3xl font-bold mb-12">Deliverables</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              "Advanced product filtering",
-              "Quick-view product modals",
-              "Seamless checkout flow",
-              "Wishlist & save for later",
-              "Size & fit recommendations",
-              "Real-time inventory updates"
+              "Core Brand Assets",
+              "Color System",
+              "Typography System",
+              "IGraphic Elements",
+              "Brand Guidelines",
+              "Visual Language"
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-amber-500 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-rose-500 mt-0.5" />
                 <span>{feature}</span>
               </div>
             ))}
@@ -89,19 +89,19 @@ const EcommercePlatform = () => {
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Role</span>
-            <p className="text-lg font-medium mt-2">UX/UI Designer</p>
+            <p className="text-lg font-medium mt-2">Graphic Designer</p>
           </div>
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Timeline</span>
-            <p className="text-lg font-medium mt-2">4 Months</p>
+            <p className="text-lg font-medium mt-2">1/2 Days</p>
           </div>
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Tools</span>
-            <p className="text-lg font-medium mt-2">Figma, Webflow</p>
+            <p className="text-lg font-medium mt-2">Photoshop, Illustrator</p>
           </div>
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Year</span>
-            <p className="text-lg font-medium mt-2">2024</p>
+            <p className="text-lg font-medium mt-2">2025</p>
           </div>
         </div>
       </section>
@@ -111,4 +111,4 @@ const EcommercePlatform = () => {
   );
 };
 
-export default EcommercePlatform;
+export default BrandIdentity;

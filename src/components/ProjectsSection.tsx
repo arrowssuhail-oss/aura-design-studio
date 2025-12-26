@@ -1,9 +1,18 @@
-import { ArrowUpRight, BarChart3, Palette, ShoppingCart, Smartphone } from "lucide-react";
+import { ArrowUpRight, BarChart3, Palette, PanelsTopLeft, Smartphone, MonitorSmartphone } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const projects = [
   {
     id: 1,
+    title: "Custom & Unique Identity",
+    category: "Graphic Design",
+    color: "from-rose-500/30 to-rose-500/5",
+    icon: Palette,
+    shapes: ["rounded-full", "rounded-lg", "rounded-full"],
+    link: "/projects/brand-identity",
+  },
+  {
+    id: 2,
     title: "Fintech Dashboard",
     category: "UI/UX Design",
     color: "from-accent/40 to-accent/10",
@@ -12,27 +21,18 @@ const projects = [
     link: "/projects/fintech-dashboard",
   },
   {
-    id: 2,
-    title: "Brand Identity System",
-    category: "Graphic Design",
-    color: "from-rose-500/30 to-rose-500/5",
-    icon: Palette,
-    shapes: ["rounded-full", "rounded-lg", "rounded-full"],
-    link: "/projects/brand-identity",
-  },
-  {
     id: 3,
-    title: "E-commerce Platform",
+    title: "Antigravity",
     category: "Web Design",
     color: "from-amber-500/30 to-amber-500/5",
-    icon: ShoppingCart,
+    icon: PanelsTopLeft,
     shapes: ["rounded-md", "rounded-full", "rounded-lg"],
     link: "/projects/ecommerce-platform",
   },
   {
     id: 4,
-    title: "Mobile App Design",
-    category: "UI/UX Design",
+    title: "Video Editing",
+    category: "Edited Videos",
     color: "from-violet-500/30 to-violet-500/5",
     icon: Smartphone,
     shapes: ["rounded-2xl", "rounded-lg", "rounded-full"],
@@ -48,11 +48,12 @@ const ProjectsSection = () => {
           <div>
             <span className="text-accent text-sm font-medium uppercase tracking-widest">Portfolio</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4">
-              Selected works
+              Works
             </h2>
+            <span className="text-accent text-sm font-medium uppercase tracking-widest">Completed Projects</span>
           </div>
           <p className="text-muted-foreground mt-4 md:mt-0 max-w-md">
-            A curated collection of projects showcasing my design thinking and creative problem-solving.
+            A Curated Collection of Projects Showcasing My Design Thinking and creative problem-solving.
           </p>
         </div>
 

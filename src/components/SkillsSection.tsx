@@ -1,13 +1,14 @@
-import { Palette, Layout, PenTool, Monitor, Layers, Sparkles } from "lucide-react";
+import { Palette, Layout, PenTool, Monitor, Layers, Sparkles, Video } from "lucide-react";
 
 const skills = [
   { name: "Adobe Creative Suite", icon: PenTool, description: "Photoshop, Illustrator & more" },
-  { name: "UI/UX Design", icon: Layout, description: "User-centered interfaces" },
-  { name: "Graphic Design", icon: Palette, description: "Visual brand identity" },
+  { name: "UI/UX Design", icon: Layout, description: "Antigravity, Figma(Learning)" },
+  { name: "Graphic Design", icon: Palette, description: "Photoshop, Illustrator" },
   { name: "Illustration", icon: PenTool, description: "Custom graphics" },
-  { name: "Web Design", icon: Monitor, description: "Responsive layouts" },
-  { name: "Design Systems", icon: Layers, description: "Scalable components" },
-  { name: "AI Tools", icon: Sparkles, description: "Modern workflows" },
+  { name: "Web Design", icon: Monitor, description: "Antigravity" },
+  { name: "Design Systems", icon: Layers, description: "Refference" },
+  { name: "AI Tools", icon: Sparkles, description: "Latest AI tools" },
+  { name: "Video Editing", icon: Video, description: "Premiere Pro, After Effects, DaVinci Resolve" },
 ];
 
 const SkillsSection = () => {
