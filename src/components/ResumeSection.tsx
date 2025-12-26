@@ -46,12 +46,14 @@ const ResumeSection = () => {
               Experience & Education
             </h2>
           </div>
-          <Button variant="accent" className="mt-6 md:mt-0">
-            <Download className="mr-2 h-4 w-4" />
-            Download CV
+          <Button variant="accent" className="mt-6 md:mt-0" asChild>
+            <a href="/MUHAMMED SUHAIL CV.pdf" download="MUHAMMED_SUHAIL_CV.pdf">
+              <Download className="mr-2 h-4 w-4" />
+              Download CV
+            </a>
           </Button>
         </div>
-        
+
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Experience */}
           <div>
@@ -61,7 +63,7 @@ const ResumeSection = () => {
               </div>
               <h3 className="text-xl font-semibold">Work Experience</h3>
             </div>
-            
+
             <div className="space-y-0">
               {experience.map((item, index) => (
                 <div key={index} className="relative pl-8 pb-10 last:pb-0">
@@ -73,7 +75,7 @@ const ResumeSection = () => {
                   <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-accent/20 border-2 border-accent flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-accent" />
                   </div>
-                  
+
                   <div className="glass-card p-6">
                     <span className="text-xs text-accent font-medium">{item.period}</span>
                     <h4 className="text-lg font-semibold mt-2">{item.title}</h4>
@@ -84,7 +86,7 @@ const ResumeSection = () => {
               ))}
             </div>
           </div>
-          
+
           {/* Education */}
           <div>
             <div className="flex items-center gap-3 mb-8">
@@ -93,7 +95,7 @@ const ResumeSection = () => {
               </div>
               <h3 className="text-xl font-semibold">Education</h3>
             </div>
-            
+
             <div className="space-y-0">
               {education.map((item, index) => (
                 <div key={index} className="relative pl-8 pb-10 last:pb-0">
@@ -105,7 +107,7 @@ const ResumeSection = () => {
                   <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-accent/20 border-2 border-accent flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-accent" />
                   </div>
-                  
+
                   <div className="glass-card p-6">
                     <span className="text-xs text-accent font-medium">{item.period}</span>
                     <h4 className="text-lg font-semibold mt-2">{item.title}</h4>

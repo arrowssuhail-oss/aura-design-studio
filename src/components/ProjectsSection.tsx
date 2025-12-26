@@ -1,4 +1,5 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, BarChart3, Palette, ShoppingCart, Smartphone } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const projects = [
   {
@@ -6,24 +7,36 @@ const projects = [
     title: "Fintech Dashboard",
     category: "UI/UX Design",
     color: "from-accent/40 to-accent/10",
+    icon: BarChart3,
+    shapes: ["rounded-lg", "rounded-full", "rounded-md"],
+    link: "/projects/fintech-dashboard",
   },
   {
     id: 2,
     title: "Brand Identity System",
     category: "Graphic Design",
     color: "from-rose-500/30 to-rose-500/5",
+    icon: Palette,
+    shapes: ["rounded-full", "rounded-lg", "rounded-full"],
+    link: "/projects/brand-identity",
   },
   {
     id: 3,
     title: "E-commerce Platform",
     category: "Web Design",
     color: "from-amber-500/30 to-amber-500/5",
+    icon: ShoppingCart,
+    shapes: ["rounded-md", "rounded-full", "rounded-lg"],
+    link: "/projects/ecommerce-platform",
   },
   {
     id: 4,
     title: "Mobile App Design",
     category: "UI/UX Design",
     color: "from-violet-500/30 to-violet-500/5",
+    icon: Smartphone,
+    shapes: ["rounded-2xl", "rounded-lg", "rounded-full"],
+    link: "/projects/mobile-app-design",
   },
 ];
 
@@ -42,18 +55,32 @@ const ProjectsSection = () => {
             A curated collection of projects showcasing my design thinking and creative problem-solving.
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-2 gap-6">
           {projects.map((project, index) => (
-            <div
+            <Link
               key={project.id}
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift"
+              to={project.link}
+              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift block"
             >
               {/* Background gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${project.color}`} />
-              
+
+              {/* Animated visual elements */}
+              <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                {/* Floating shapes */}
+                <div className={`absolute w-32 h-32 ${project.shapes[0]} bg-foreground/5 animate-float`} style={{ top: '20%', left: '60%', animationDelay: '0s' }} />
+                <div className={`absolute w-20 h-20 ${project.shapes[1]} bg-foreground/10 animate-float`} style={{ top: '50%', left: '70%', animationDelay: '0.5s' }} />
+                <div className={`absolute w-16 h-16 ${project.shapes[2]} bg-foreground/5 animate-float`} style={{ top: '30%', left: '50%', animationDelay: '1s' }} />
+
+                {/* Central icon */}
+                <div className="relative z-10 w-24 h-24 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                  <project.icon className="w-12 h-12 text-foreground/60 group-hover:text-foreground transition-colors duration-300" />
+                </div>
+              </div>
+
               {/* Content overlay */}
-              <div className="absolute inset-0 p-8 flex flex-col justify-between">
+              <div className="absolute inset-0 p-8 flex flex-col justify-between z-20">
                 <div className="flex justify-between items-start">
                   <span className="px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm text-xs font-medium">
                     {project.category}
@@ -62,15 +89,15 @@ const ProjectsSection = () => {
                     <ArrowUpRight className="w-5 h-5" />
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold">{project.title}</h3>
                 </div>
               </div>
-              
+
               {/* Hover gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
+            </Link>
           ))}
         </div>
       </div>

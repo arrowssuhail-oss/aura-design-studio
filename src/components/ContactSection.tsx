@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MapPin, Send, Linkedin, Twitter, Dribbble, Github } from "lucide-react";
+import { Mail, MapPin, Send, Linkedin, Palette, Instagram, Link } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const socials = [
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Dribbble, href: "#", label: "Dribbble" },
-  { icon: Github, href: "#", label: "GitHub" },
+  { icon: Linkedin, href: "https://www.linkedin.com/in/suhailbinsaidalavi/", label: "LinkedIn" },
+  { icon: Palette, href: "https://www.behance.net/ArrowsSuhail", label: "Adobe Behance" },
+  { icon: Instagram, href: "https://www.instagram.com/arrows.in_/", label: "Instagram" },
+  { icon: Link, href: "https://linktr.ee/arrows.suhail?utm_source=linktree_profile_share&ltsid=e2729df1-4401-42a8-b1e9-c9f141fda649", label: "Linktree" },
 ];
 
 const ContactSection = () => {
@@ -18,9 +18,15 @@ const ContactSection = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Construct mailto URL
+    const subject = encodeURIComponent(`Contact from ${formData.name}`);
+    const body = encodeURIComponent(`${formData.message}\n\nFrom: ${formData.name} (${formData.email})`);
+    window.location.href = `mailto:arrows.suhail@gmail.com?subject=${subject}&body=${body}`;
+
     toast({
-      title: "Message sent!",
-      description: "Thanks for reaching out. I'll get back to you soon.",
+      title: "Opening email client...",
+      description: "Please send the pre-filled email to complete your message.",
     });
     setFormData({ name: "", email: "", message: "" });
   };
@@ -37,7 +43,7 @@ const ContactSection = () => {
             Have a project in mind? I'd love to hear about it. Send me a message and let's create something amazing.
           </p>
         </div>
-        
+
         <div className="grid lg:grid-cols-5 gap-12">
           {/* Contact info */}
           <div className="lg:col-span-2 space-y-8">
@@ -48,11 +54,11 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">hello@alexmorgan.com</p>
+                  <p className="font-medium">arrows.suhail@gmail.com</p>
                 </div>
               </div>
             </div>
-            
+
             <div className="glass-card p-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
@@ -60,11 +66,11 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Location</p>
-                  <p className="font-medium">San Francisco, CA</p>
+                  <p className="font-medium">Malappuram, Kerala</p>
                 </div>
               </div>
             </div>
-            
+
             <div>
               <p className="text-sm text-muted-foreground mb-4">Connect with me</p>
               <div className="flex gap-3">
@@ -72,6 +78,8 @@ const ContactSection = () => {
                   <a
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-11 h-11 rounded-xl bg-muted hover:bg-accent/10 flex items-center justify-center transition-colors group"
                     aria-label={social.label}
                   >
@@ -81,7 +89,7 @@ const ContactSection = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Contact form */}
           <div className="lg:col-span-3">
             <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6">
