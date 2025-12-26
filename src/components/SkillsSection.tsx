@@ -4,8 +4,6 @@ const skills = [
   { name: "Adobe Creative Suite", icon: PenTool, description: "Photoshop, Illustrator & more" },
   { name: "UI/UX Design", icon: Layout, description: "User-centered interfaces" },
   { name: "Graphic Design", icon: Palette, description: "Visual brand identity" },
-  { name: "Motion Design", icon: Play, description: "Engaging animations" },
-  { name: "Figma", icon: Figma, description: "Design & prototyping" },
   { name: "Illustration", icon: PenTool, description: "Custom graphics" },
   { name: "Web Design", icon: Monitor, description: "Responsive layouts" },
   { name: "Design Systems", icon: Layers, description: "Scalable components" },
