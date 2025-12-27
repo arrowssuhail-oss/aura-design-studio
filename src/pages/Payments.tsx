@@ -37,8 +37,29 @@ export default function Payments() {
     const [paymentStep, setPaymentStep] = useState<"qr" | "processing" | "success">("qr");
 
     if (!user) {
-        navigate("/login");
-        return null;
+        return (
+            <div className="min-h-screen bg-background text-foreground flex flex-col">
+                <Navbar />
+                <main className="flex-grow flex items-center justify-center p-6 bg-gradient-to-b from-background to-accent/5">
+                    <div className="glass-card p-12 text-center max-w-md animate-fade-up border-accent/20">
+                        <Lock className="w-16 h-16 text-accent mx-auto mb-6" />
+                        <h1 className="text-3xl font-bold mb-4">Login Required</h1>
+                        <p className="text-muted-foreground mb-8">
+                            Please sign in to manage your studio subscriptions, billing methods, and download your premium assets.
+                        </p>
+                        <div className="flex flex-col gap-3">
+                            <Button variant="accent" onClick={() => navigate("/login")} className="w-full h-12 rounded-xl text-lg font-bold shadow-lg shadow-accent/20">
+                                Sign In
+                            </Button>
+                            <Button variant="ghost" onClick={() => navigate("/")} className="w-full">
+                                Back to Home
+                            </Button>
+                        </div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
     }
 
     const handleInitiatePayment = (planId: string) => {
