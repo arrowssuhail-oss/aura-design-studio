@@ -1,10 +1,10 @@
-import { ArrowLeft, PanelsTopLeft, CheckCircle } from "lucide-react";
+import { ArrowLeft, PanelsTopLeft, CheckCircle, Code } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import heroImage from "@/assets/antigravity-hero.png";
 
-const EcommercePlatform = () => {
+const WebDesign = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -78,12 +78,12 @@ const EcommercePlatform = () => {
           <h2 className="text-3xl font-bold mb-12">Key Features</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              "Advanced product filtering",
-              "Quick-view product modals",
-              "Seamless checkout flow",
-              "Wishlist & save for later",
-              "Size & fit recommendations",
-              "Real-time inventory updates"
+              "Icon or Illustration",
+              "Descriptive Text",
+              "Call to Action",
+              "Lead with Benefits",
+              "Maintain Visual Hierarchy",
+              "Mobile Responsiveness"
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-amber-500 mt-0.5" />
@@ -99,7 +99,7 @@ const EcommercePlatform = () => {
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Role</span>
-            <p className="text-lg font-medium mt-2">UX/UI Designer</p>
+            <p className="text-lg font-medium mt-2">Designer</p>
           </div>
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Timeline</span>
@@ -107,7 +107,14 @@ const EcommercePlatform = () => {
           </div>
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Tools</span>
-            <p className="text-lg font-medium mt-2">Antigravity</p>
+            <div className="flex items-center gap-4 mt-2">
+              <a href="https://antigravity.google/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                <img src="/google-antigravity-ai-logo-hd.png" alt="Antigravity" className="w-6 h-6 object-contain" />
+              </a>
+              <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                <img src="/vscode.png" alt="VSCode" className="w-6 h-6 object-contain" />
+              </a>
+            </div>
           </div>
           <div>
             <span className="text-sm text-muted-foreground uppercase tracking-widest">Year</span>
@@ -121,4 +128,4 @@ const EcommercePlatform = () => {
   );
 };
 
-export default EcommercePlatform;
+export default WebDesign;

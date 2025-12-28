@@ -2,12 +2,12 @@ import { Palette, Layout, PenTool, Monitor, Layers, Sparkles, Video } from "luci
 
 const skills = [
   { name: "Adobe Creative Suite", icon: PenTool, description: "Photoshop, Illustrator & more" },
-  { name: "UI/UX Design", icon: Layout, description: "Antigravity, Figma(Learning)" },
+  { name: "UI/UX Design", icon: Layout, description: "WordPress, Figma (Learning)" },
   { name: "Graphic Design", icon: Palette, description: "Photoshop, Illustrator" },
   { name: "Illustration", icon: PenTool, description: "Custom graphics" },
-  { name: "Web Design", icon: Monitor, description: "Antigravity" },
+  { name: "Web Design", icon: Monitor, description: "Google Antigravity" },
   { name: "Design Systems", icon: Layers, description: "Refference" },
-  { name: "AI Tools", icon: Sparkles, description: "Latest AI tools" },
+  { name: "AI Tools", icon: Sparkles, description: "Latest AI Tools" },
   { name: "Video Editing", icon: Video, description: "Premiere Pro, After Effects, DaVinci Resolve" },
 ];
 

@@ -1,4 +1,4 @@
-import { ArrowUpRight, BarChart3, Palette, PanelsTopLeft, Smartphone } from "lucide-react";
+import { ArrowUpRight, BarChart3, Palette, PanelsTopLeft, Smartphone, ChartNoAxesGantt } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 
@@ -10,16 +10,16 @@ const projects = [
     color: "from-rose-500/30 to-rose-500/5",
     icon: Palette,
     shapes: ["rounded-full", "rounded-lg", "rounded-full"],
-    link: "/projects/brand-identity",
+    link: "/projects/identity",
   },
   {
     id: 2,
-    title: "Fintech Dashboard",
+    title: "Human Centered Design",
     category: "UI/UX Design",
     color: "from-accent/40 to-accent/10",
-    icon: BarChart3,
+    icon: ChartNoAxesGantt,
     shapes: ["rounded-lg", "rounded-full", "rounded-md"],
-    link: "/projects/fintech-dashboard",
+    link: "/projects/ui-ux-design",
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ const projects = [
     color: "from-amber-500/30 to-amber-500/5",
     icon: PanelsTopLeft,
     shapes: ["rounded-md", "rounded-full", "rounded-lg"],
-    link: "/projects/ecommerce-platform",
+    link: "/projects/webdesign",
   },
   {
     id: 4,
@@ -37,7 +37,7 @@ const projects = [
     color: "from-violet-500/30 to-violet-500/5",
     icon: Smartphone,
     shapes: ["rounded-2xl", "rounded-lg", "rounded-full"],
-    link: "/projects/mobile-app-design",
+    link: "/projects/video-editing",
   },
 ];
 

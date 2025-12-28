@@ -7,10 +7,10 @@ import { useEffect } from "react";
 import Index from "@/pages/Index";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/NotFound";
-import FintechDashboard from "@/pages/projects/ui/ux design";
-import BrandIdentity from "@/pages/projects/graphicdesign";
-import EcommercePlatform from "@/pages/projects/webdesign";
-import MobileAppDesign from "@/pages/projects/videoediting";
+import HumanCenteredDesign from "@/pages/projects/ux design";
+import Identity from "@/pages/projects/graphicdesign";
+import WebDesign from "@/pages/projects/webdesign";
+import VideoEditing from "@/pages/projects/videoediting";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Dashboard from "@/pages/Dashboard";
@@ -82,10 +82,10 @@ const App = () => (
             <Route path="/payments" element={<Payments />} />
             <Route path="/legal" element={<Legal />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/projects/fintech-dashboard" element={<FintechDashboard />} />
-            <Route path="/projects/brand-identity" element={<BrandIdentity />} />
-            <Route path="/projects/ecommerce-platform" element={<EcommercePlatform />} />
-            <Route path="/projects/mobile-app-design" element={<MobileAppDesign />} />
+            <Route path="/projects/ui-ux-design" element={<HumanCenteredDesign />} />
+            <Route path="/projects/identity" element={<Identity />} />
+            <Route path="/projects/webdesign" element={<WebDesign />} />
+            <Route path="/projects/video-editing" element={<VideoEditing />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

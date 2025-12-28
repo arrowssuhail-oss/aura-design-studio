@@ -4,9 +4,9 @@ import { Download, Briefcase, GraduationCap } from "lucide-react";
 const experience = [
   {
     title: "Web Designer",
-    company: "Creative Studio",
+    company: "Arrows.in",
     period: "2025 — 2025",
-    description: "Designed digital experiences for clients across fintech and healthcare.",
+    description: "Crafted high-conversion digital experiences for Fintech and Healthcare clients, focusing on user accessibility and intuitive UI.",
   },
   {
     title: "Graphic Designer",

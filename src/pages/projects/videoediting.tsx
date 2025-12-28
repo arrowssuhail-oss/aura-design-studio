@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 
-const MobileAppDesign = () => {
+const VideoEditing = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -121,4 +121,4 @@ const MobileAppDesign = () => {
   );
 };
 
-export default MobileAppDesign;
+export default VideoEditing;

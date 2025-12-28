@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const BrandIdentity = () => {
+const Identity = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -111,4 +111,4 @@ const BrandIdentity = () => {
   );
 };
 
-export default BrandIdentity;
+export default Identity;
