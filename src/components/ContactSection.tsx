@@ -48,8 +48,8 @@ const ContactSection = () => {
 
         <div className="grid lg:grid-cols-5 gap-12">
           {/* Contact info */}
-          <div className="lg:col-span-2 space-y-8 animate-fade-up-scroll">
-            <div className="glass-card p-6">
+          <div className="lg:col-span-2 space-y-8">
+            <div className="glass-card p-6 animate-fade-up-scroll">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
                   <Mail className="w-5 h-5 text-accent" />
@@ -61,7 +61,7 @@ const ContactSection = () => {
               </div>
             </div>
 
-            <div className="glass-card p-6">
+            <div className="glass-card p-6 animate-fade-up-scroll">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-accent" />
@@ -73,7 +73,7 @@ const ContactSection = () => {
               </div>
             </div>
 
-            <div>
+            <div className="animate-fade-up-scroll">
               <p className="text-sm text-muted-foreground mb-4">Connect with me</p>
               <div className="flex gap-3">
                 {socials.map((social) => (

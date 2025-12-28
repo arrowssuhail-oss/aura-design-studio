@@ -39,8 +39,8 @@
     /* Custom design tokens */
     --gradient-accent: linear-gradient(135deg, hsl(174 72% 45%), hsl(190 80% 50%));
     --gradient-subtle: linear-gradient(180deg, hsl(210 20% 98%), hsl(210 15% 95%));
-    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
-    
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+
     --shadow-sm: 0 2px 8px -2px hsl(220 25% 10% / 0.08);
     --shadow-md: 0 8px 24px -8px hsl(220 25% 10% / 0.12);
     --shadow-lg: 0 16px 48px -12px hsl(220 25% 10% / 0.15);
@@ -86,7 +86,7 @@
     --input: 220 20% 18%;
     --ring: 174 72% 50%;
 
-    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
     --shadow-glow: 0 0 80px hsl(174 72% 50% / 0.25);
   }
 }
@@ -142,19 +142,43 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 
 @keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes fadeUp {
@@ -162,6 +186,7 @@
     opacity: 0;
     transform: translateY(40px) scale(0.5);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -172,4 +197,23 @@
   animation: fadeUp linear;
   animation-timeline: view();
   animation-range: entry 0% cover 40%;
+}
+
+@keyframes flipIn {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(90deg) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg) scale(1);
+  }
+}
+
+.animate-flip-in-scroll {
+  animation: flipIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-timeline: view();
+  animation-range: entry 10% cover 30%;
+  transform-origin: center top;
 }

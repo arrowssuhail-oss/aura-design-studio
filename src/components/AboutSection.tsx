@@ -21,26 +21,26 @@ const AboutSection = () => {
           </div>
 
           {/* Content side */}
-          <div className="animate-fade-up-scroll">
-            <span className="text-accent text-sm font-medium uppercase tracking-widest">About Me</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-8">
+          <div>
+            <span className="text-accent text-sm font-medium uppercase tracking-widest block animate-fade-up-scroll">About Me</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-8 animate-fade-up-scroll">
               Designing Visions, Editing Realities
             </h2>
             <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
-              <p>
+              <p className="animate-fade-up-scroll">
                 Hello! I’m Muhammed Suhail K, a self-taught and passionate Graphic Designer and Video Editor based
                 in Malappuram, Kerala, India. I have created Numerous Social Media creatives and Printable works,
                 Continually Learning and Researching to Expand my expertise. My exploration spans various fields of
                 graphic design, including Video Editing
               </p>
-              <p>
+              <p className="animate-fade-up-scroll">
                 As a designer, I excel at creating innovative designs and delivering compelling presentations.
                 My passion also extends to mentoring and instructing aspiring graphic designers, helping them
                 develop their skills and achieve their creative potential.
               </p>
             </div>
 
-            <div className="mt-10 pt-10 border-t border-border">
+            <div className="mt-10 pt-10 border-t border-border animate-fade-up-scroll">
               <p className="text-lg italic text-foreground/80">
                 "Design is not just what it looks like, it's how it works."
               </p>

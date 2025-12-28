@@ -62,7 +62,7 @@ const ProjectsSection = () => {
             <Link
               key={project.id}
               to={project.link}
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift block animate-fade-up-scroll"
+              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift block animate-flip-in-scroll"
             >
               {/* Background gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${project.color}`} />
