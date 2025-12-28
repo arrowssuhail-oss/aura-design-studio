@@ -33,7 +33,7 @@ export default function Signup() {
             title: "Account created!",
             description: "Signed in with Google successfully. Welcome to Arrows.in!",
         });
-        navigate("/dashboard");
+        navigate("/");
     };
 
     return (

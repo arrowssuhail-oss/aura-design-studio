@@ -25,7 +25,7 @@ export default function Login() {
                 title: "Welcome back!",
                 description: "You have successfully logged in.",
             });
-            navigate("/dashboard");
+            navigate("/");
         } else {
             toast({
                 title: "Login failed",
@@ -41,7 +41,7 @@ export default function Login() {
             title: "Welcome back!",
             description: "Signed in with Google successfully.",
         });
-        navigate("/dashboard");
+        navigate("/");
     };
 
     return (
