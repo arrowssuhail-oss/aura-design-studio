@@ -19,7 +19,7 @@ const Legal = () => {
                                 <h2 className="text-2xl font-semibold mb-6">Terms and Conditions</h2>
                                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                                     <p>
-                                        The terms "we", "us", and "our" refer to Muhammed Suhail K, with a registered/operational office at Arrows Design Malappuram KERALA 673638. The terms "you", "your", "user", and "visitor" refer to any natural or legal person visiting the website or agreeing to purchase from the business.
+                                        The terms "we", "us", and "our" refer to Muhammed Suhail K, with a registered/operational office at Arrows Design Malappuram, Kerala 673638. The terms "you", "your", "user", and "visitor" refer to any natural or legal person visiting the website or agreeing to purchase from the business.
                                     </p>
 
                                     <h3 className="text-foreground font-medium mt-4">Key Usage Terms</h3>
