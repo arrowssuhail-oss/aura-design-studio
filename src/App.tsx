@@ -15,6 +15,7 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Dashboard from "@/pages/Dashboard";
 import Payments from "@/pages/Payments";
+import Legal from "@/pages/Legal";
 import { AuthProvider } from "@/context/AuthContext";
 import ChatBot from "@/components/ChatBot";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -79,6 +80,7 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/payments" element={<Payments />} />
+            <Route path="/legal" element={<Legal />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/projects/fintech-dashboard" element={<FintechDashboard />} />
             <Route path="/projects/brand-identity" element={<BrandIdentity />} />

@@ -109,8 +109,8 @@ export default function GoogleAuthSimulation({ isOpen, onClose, onSelectAccount,
                 <div className="p-4 bg-white text-[11px] text-gray-500 border-t border-gray-100">
                     To continue, Google will share your name, email address, language preference, and profile picture with Arrows.in
                     <div className="mt-4 flex gap-4">
-                        <a href="#" className="hover:underline text-blue-600">Privacy Policy</a>
-                        <a href="#" className="hover:underline text-blue-600">Terms of Service</a>
+                        <a href="/legal#privacy" target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600">Privacy Policy</a>
+                        <a href="/legal#terms" target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600">Terms of Service</a>
                     </div>
                 </div>
 
