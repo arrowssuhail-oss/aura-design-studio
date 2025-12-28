@@ -156,3 +156,20 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-up-scroll {
+  animation: fadeUp linear;
+  animation-timeline: view();
+  animation-range: entry 0% cover 40%;
+}

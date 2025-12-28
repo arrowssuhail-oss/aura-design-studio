@@ -5,7 +5,7 @@ const AboutSection = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image side */}
           <div className="relative">
-            <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-accent/20 via-muted to-secondary overflow-hidden">
+            <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-accent/20 via-muted to-secondary overflow-hidden animate-fade-up-scroll">
               <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
               <img
                 src="/1000103443.png"
@@ -21,7 +21,7 @@ const AboutSection = () => {
           </div>
 
           {/* Content side */}
-          <div>
+          <div className="animate-fade-up-scroll">
             <span className="text-accent text-sm font-medium uppercase tracking-widest">About Me</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-8">
               Designing Visions, Editing Realities

@@ -22,7 +22,7 @@ const SkillsSection = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-up-scroll">
           {skills.map((skill, index) => (
             <div
               key={skill.name}

@@ -49,7 +49,7 @@ const ResumeSection = () => {
           </Button>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-16">
+        <div className="grid lg:grid-cols-2 gap-16 animate-fade-up-scroll">
           {/* Experience */}
           <div>
             <div className="flex items-center gap-3 mb-8">

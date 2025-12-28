@@ -57,7 +57,7 @@ const ProjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 animate-fade-up-scroll">
           {projects.map((project, index) => (
             <Link
               key={project.id}

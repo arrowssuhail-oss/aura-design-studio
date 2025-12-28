@@ -46,7 +46,7 @@ const ContactSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-5 gap-12">
+        <div className="grid lg:grid-cols-5 gap-12 animate-fade-up-scroll">
           {/* Contact info */}
           <div className="lg:col-span-2 space-y-8">
             <div className="glass-card p-6">
