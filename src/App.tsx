@@ -16,6 +16,7 @@ import Signup from "@/pages/Signup";
 import Dashboard from "@/pages/Dashboard";
 import Payments from "@/pages/Payments";
 import { AuthProvider } from "@/context/AuthContext";
+import ChatBot from "@/components/ChatBot";
 
 // Component to handle hash scrolling
 const ScrollToAnchor = () => {
@@ -85,6 +86,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <ChatBot />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
