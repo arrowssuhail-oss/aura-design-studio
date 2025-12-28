@@ -7,9 +7,11 @@ const AboutSection = () => {
           <div className="relative">
             <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-accent/20 via-muted to-secondary overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
-              <div className="relative">
-                <img src={"/src/assets/1000103443.png"} />
-              </div>
+              <img
+                src="/1000103443.png"
+                alt="Profile"
+                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+              />
             </div>
             {/* Floating card */}
             <div className="absolute -bottom-6 -right-6 glass-card p-6 max-w-[240px]">
