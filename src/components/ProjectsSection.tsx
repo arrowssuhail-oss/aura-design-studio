@@ -57,12 +57,12 @@ const ProjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 animate-fade-up-scroll">
+        <div className="grid md:grid-cols-2 gap-6">
           {projects.map((project, index) => (
             <Link
               key={project.id}
               to={project.link}
-              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift block"
+              className="group relative aspect-[4/3] rounded-3xl overflow-hidden cursor-pointer hover-lift block animate-fade-up-scroll"
             >
               {/* Background gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${project.color}`} />

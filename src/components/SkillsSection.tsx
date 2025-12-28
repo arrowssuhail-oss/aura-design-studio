@@ -22,11 +22,11 @@ const SkillsSection = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-up-scroll">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {skills.map((skill, index) => (
             <div
               key={skill.name}
-              className="glass-card p-6 hover-lift group cursor-default"
+              className="glass-card p-6 hover-lift group cursor-default animate-fade-up-scroll"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">

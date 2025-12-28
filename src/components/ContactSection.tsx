@@ -46,9 +46,9 @@ const ContactSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-5 gap-12 animate-fade-up-scroll">
+        <div className="grid lg:grid-cols-5 gap-12">
           {/* Contact info */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 animate-fade-up-scroll">
             <div className="glass-card p-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
@@ -94,7 +94,7 @@ const ContactSection = () => {
 
           {/* Contact form */}
           <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6">
+            <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6 animate-fade-up-scroll">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Name</label>

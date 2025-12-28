@@ -49,7 +49,7 @@ const ResumeSection = () => {
           </Button>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-16 animate-fade-up-scroll">
+        <div className="grid lg:grid-cols-2 gap-16">
           {/* Experience */}
           <div>
             <div className="flex items-center gap-3 mb-8">
@@ -61,7 +61,7 @@ const ResumeSection = () => {
 
             <div className="space-y-0">
               {experience.map((item, index) => (
-                <div key={index} className="relative pl-8 pb-10 last:pb-0">
+                <div key={index} className="relative pl-8 pb-10 last:pb-0 animate-fade-up-scroll">
                   {/* Timeline line */}
                   {index !== experience.length - 1 && (
                     <div className="absolute left-[11px] top-4 w-px h-full bg-border" />
@@ -93,7 +93,7 @@ const ResumeSection = () => {
 
             <div className="space-y-0">
               {education.map((item, index) => (
-                <div key={index} className="relative pl-8 pb-10 last:pb-0">
+                <div key={index} className="relative pl-8 pb-10 last:pb-0 animate-fade-up-scroll">
                   {/* Timeline line */}
                   {index !== education.length - 1 && (
                     <div className="absolute left-[11px] top-4 w-px h-full bg-border" />
