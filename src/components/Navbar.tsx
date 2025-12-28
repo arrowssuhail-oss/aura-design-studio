@@ -32,16 +32,43 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const currentScrollY = window.scrollY;
+
+      // Handle background transparency
+      setIsScrolled(currentScrollY > 50);
+
+      // Handle hide/show on mobile scroll
+      if (window.innerWidth < 768) {
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          // Scrolling down & past 100px - Hide
+          setIsVisible(false);
+          setIsMobileMenuOpen(false); // Close menu if open
+        } else {
+          // Scrolling up - Show
+          setIsVisible(true);
+        }
+      } else {
+        setIsVisible(true); // Always visible on desktop
+      }
+
+      setLastScrollY(currentScrollY);
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const { user, logout } = useAuth();
-  return <nav className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6", isScrolled ? "py-4" : "py-6")}>
+  return <nav className={cn(
+    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6",
+    isScrolled ? "py-4" : "py-6",
+    isVisible ? "translate-y-0" : "-translate-y-full"
+  )}>
     <div className={cn("max-w-6xl mx-auto flex items-center justify-between px-6 py-3 rounded-2xl transition-all duration-300", isScrolled ? "bg-background/80 backdrop-blur-xl shadow-md border border-border/50" : "")}>
       <Link to="/" className="flex items-center" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
         <img src={logo} alt="arrows.in logo" className="h-19 w-28 object-contain" />

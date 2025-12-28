@@ -217,3 +217,19 @@
   animation-range: entry 10% cover 30%;
   transform-origin: center top;
 }
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
