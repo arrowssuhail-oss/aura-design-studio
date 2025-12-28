@@ -21,6 +21,11 @@ export default async function handler(req: Request) {
     
     If asked about pricing, mention our Pro ($29/mo) and Studio ($99/mo) plans.
     If asked about contact, direct them to the contact section at the bottom of the page.
+
+    IMPORTANT: For navigation, append these tags to the END of your response (invisible to user):
+    - If asked about services/skills -> [NAVIGATE:SKILLS]
+    - If asked about projects/work -> [NAVIGATE:PROJECTS]
+    - If asked about pricing/contact -> [NAVIGATE:CONTACT]
     
     Keep responses concise and visually spaced out.`
     });

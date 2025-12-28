@@ -9,13 +9,18 @@ import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import ReactMarkdown from 'react-markdown'; // Run: npm install react-markdown
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function ChatBot() {
     const [isOpen, setIsOpen] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const [input, setInput] = useState('');
 
     // Cast to any to bypass type mismatch issues with strict SDK types
-    const { messages, isLoading, append, setMessages, input, handleInputChange, handleSubmit } = useChat({
+    const { messages, isLoading, append, setMessages } = useChat({
         api: '/api/chat', // Ensure this matches your route
         onError: (error: any) => {
             console.error("Chat error:", error);
@@ -23,16 +28,71 @@ export default function ChatBot() {
         }
     } as any) as any;
 
-    // Auto-scroll to bottom on new messages
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInput(e.target.value);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!input.trim()) return;
+
+        const currentInput = input;
+        setInput('');
+
+        await append({
+            role: 'user',
+            content: currentInput
+        });
+    };
+
+    // Auto-scroll to bottom on new messages and handle navigation tags
     useEffect(() => {
-        if (scrollRef.current) {
-            const scrollContainer = scrollRef.current;
-            scrollContainer.scrollTo({
-                top: scrollContainer.scrollHeight,
-                behavior: 'smooth'
-            });
+        if (messages.length > 0) {
+            const lastMessage = messages[messages.length - 1];
+
+            // Check for navigation tags in the response
+            if (lastMessage.role === 'assistant') {
+                const content = lastMessage.content;
+                let targetSection = '';
+
+                if (content.includes('[NAVIGATE:SKILLS]')) {
+                    targetSection = 'skills';
+                } else if (content.includes('[NAVIGATE:PROJECTS]')) {
+                    targetSection = 'projects';
+                } else if (content.includes('[NAVIGATE:CONTACT]')) {
+                    targetSection = 'contact';
+                }
+
+                if (targetSection) {
+                    if (location.pathname !== '/') {
+                        navigate('/');
+                        // Wait for navigation to complete before scrolling
+                        setTimeout(() => {
+                            const element = document.getElementById(targetSection);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }, 500);
+                    } else {
+                        const element = document.getElementById(targetSection);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                }
+            }
         }
-    }, [messages, isLoading]);
+
+        if (scrollRef.current) {
+            // Short timeout to ensure content renders before scrolling
+            setTimeout(() => {
+                scrollRef.current?.scrollTo({
+                    top: scrollRef.current.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+    }, [messages, isLoading, location.pathname, navigate]);
 
     const clearChat = () => {
         setMessages([]);
@@ -93,9 +153,30 @@ export default function ChatBot() {
                                 <Bot className="w-8 h-8 text-muted-foreground opacity-40" />
                             </div>
                             <h4 className="font-medium text-sm">How can I help you today?</h4>
-                            <p className="text-xs text-muted-foreground max-w-[200px] mt-2">
+                            <p className="text-xs text-muted-foreground max-w-[200px] mt-2 mb-6">
                                 Ask about our design services, pricing, or current projects.
                             </p>
+                            <div className="flex flex-col gap-2 w-full max-w-[250px]">
+                                {[
+                                    "What services do you offer?",
+                                    "Tell me about your pricing.",
+                                    "Show me recent projects."
+                                ].map((question, i) => (
+                                    <Button
+                                        key={i}
+                                        variant="outline"
+                                        className="h-auto py-2 text-xs font-normal justify-start text-muted-foreground hover:text-foreground text-left"
+                                        onClick={async () => {
+                                            await append({
+                                                role: 'user',
+                                                content: question
+                                            });
+                                        }}
+                                    >
+                                        {question}
+                                    </Button>
+                                ))}
+                            </div>
                         </div>
                     )}
 
@@ -116,7 +197,7 @@ export default function ChatBot() {
                                 )}>
                                     <div className="prose prose-sm dark:prose-invert max-w-none">
                                         <ReactMarkdown>
-                                            {m.content}
+                                            {m.content.replace(/\[NAVIGATE:[A-Z]+\]/g, '')}
                                         </ReactMarkdown>
                                     </div>
                                 </div>
