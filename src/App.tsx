@@ -17,6 +17,7 @@ import Dashboard from "@/pages/Dashboard";
 import Payments from "@/pages/Payments";
 import { AuthProvider } from "@/context/AuthContext";
 import ChatBot from "@/components/ChatBot";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Component to handle hash scrolling
 const ScrollToAnchor = () => {
