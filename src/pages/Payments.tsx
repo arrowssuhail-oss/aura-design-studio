@@ -86,6 +86,58 @@ export default function Payments() {
         });
     };
 
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const handleRazorpayPayment = async () => {
+        const res = await loadRazorpay();
+
+        if (!res) {
+            toast({
+                title: "Error",
+                description: "Razorpay SDK failed to load. Please check your connection.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        const options = {
+            "key": "YOUR_KEY_ID", // Enter the Key ID generated from the Dashboard
+            "amount": "50000", // Amount is in currency subunits. Default currency is INR.
+            "currency": "INR",
+            "name": "Arrows Design",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "handler": function (response: any) {
+                toast({
+                    title: "Payment Successful",
+                    description: `Payment ID: ${response.razorpay_payment_id}`,
+                });
+            },
+            "prefill": {
+                "name": user?.name || "Test User",
+                "email": user?.email || "test@example.com",
+                "contact": "9999999999"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+
+        const paymentObject = new (window as any).Razorpay(options);
+        paymentObject.open();
+    };
+
     const plans = [
         {
             id: "pro",
@@ -173,8 +225,11 @@ export default function Payments() {
                                 <Button variant="ghost" className="text-accent underline">Edit</Button>
                             </div>
 
-                            <Button variant="outline" className="w-full h-12 rounded-xl border-dashed border-border/50 hover:border-accent hover:bg-accent/5 transition-all">
-                                + Add New Payment Method
+                            <Button
+                                onClick={handleRazorpayPayment}
+                                className="w-full h-12 rounded-xl bg-[#3399cc] hover:bg-[#2b88b6] text-white transition-all font-bold"
+                            >
+                                Pay with Razorpay
                             </Button>
                         </div>
 
