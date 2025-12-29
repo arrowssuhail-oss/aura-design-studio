@@ -109,7 +109,7 @@ export default function Payments() {
         }
 
         const options = {
-            "key": "YOUR_KEY_ID", // Enter the Key ID generated from the Dashboard
+            "key": import.meta.env.VITE_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
             "amount": "50000", // Amount is in currency subunits. Default currency is INR.
             "currency": "INR",
             "name": "Arrows Design",
