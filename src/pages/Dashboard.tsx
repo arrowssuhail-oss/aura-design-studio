@@ -16,10 +16,14 @@ import {
     History,
     ShieldCheck,
     Trash2,
-    CreditCard
+    CreditCard,
+    Camera,
+    Upload,
+    Palette
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { db } from "@/lib/storage";
 import {
     Sheet,
     SheetContent,
@@ -33,6 +37,9 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 
+import { iconMap, defaultProjects } from "@/components/ProjectsSection";
+import { defaultPageContent, ProjectPageData } from "@/components/projectData";
+
 export default function Dashboard() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -41,6 +48,212 @@ export default function Dashboard() {
     const [isSaving, setIsSaving] = useState(false);
     const [projectUpdates, setProjectUpdates] = useState(true);
     const [securityAlerts, setSecurityAlerts] = useState(true);
+
+    // Project Management
+    const [projects, setProjects] = useState<any[]>([]);
+    const [editingProject, setEditingProject] = useState<any | null>(null);
+    const [isProjectSheetOpen, setIsProjectSheetOpen] = useState(false);
+
+    // Story Management
+    const [storyUrl, setStoryUrl] = useState("");
+    const [activeStory, setActiveStory] = useState<{ content: string; active: boolean; timestamp: number } | null>(null);
+    const [archive, setArchive] = useState<any[]>([]);
+
+    // Page Content CMS State
+    const [editingPageContent, setEditingPageContent] = useState<ProjectPageData | null>(null);
+    const [activePageId, setActivePageId] = useState<number | null>(null);
+    const [isPageContentSheetOpen, setIsPageContentSheetOpen] = useState(false);
+
+    // Load initial story state & Archive
+    useState(() => {
+        // Load Archive
+        const storedArchive = localStorage.getItem("arrows_story_archive");
+        if (storedArchive) {
+            setArchive(JSON.parse(storedArchive));
+        }
+
+        // Load Active Story
+        const stored = localStorage.getItem("arrows_story_data");
+        if (stored) {
+            const parsed = JSON.parse(stored);
+
+            // Auto Archive if expired (> 24h)
+            const isExpired = Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000;
+
+            if (parsed.active && !isExpired) {
+                setActiveStory(parsed);
+                setStoryUrl(parsed.content);
+            } else if (parsed.active && isExpired) {
+                // Move to archive
+                const newArchive = [parsed, ...(storedArchive ? JSON.parse(storedArchive) : [])];
+                localStorage.setItem("arrows_story_archive", JSON.stringify(newArchive));
+                setArchive(newArchive);
+
+                // Deactivate current
+                localStorage.removeItem("arrows_story_data");
+                setActiveStory(null);
+                setStoryUrl("");
+
+                toast({ title: "Story Archived", description: "Previous story expired and moved to archive." });
+            }
+        }
+    });
+
+    // Load Projects
+    useState(() => {
+        const storedProjects = localStorage.getItem("arrows_projects_data");
+        if (storedProjects) {
+            try {
+                setProjects(JSON.parse(storedProjects));
+            } catch (e) {
+                console.error("Failed to parse projects", e);
+            }
+        } else {
+            setProjects(defaultProjects);
+        }
+    });
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+        let file: File | undefined;
+
+        if ((e as React.DragEvent).dataTransfer) {
+            e.preventDefault();
+            file = (e as React.DragEvent).dataTransfer.files[0];
+        } else if ((e as React.ChangeEvent<HTMLInputElement>).target) {
+            file = (e as React.ChangeEvent<HTMLInputElement>).target.files?.[0];
+        }
+
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast({ title: "File too large", description: "Please use an image under 5MB for this demo.", variant: "destructive" });
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                toast({ title: "Invalid file", description: "Please upload an image file.", variant: "destructive" });
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setStoryUrl(reader.result as string);
+                toast({ title: "Image Loaded", description: "Click Update Story to save changes." });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    };
+
+    const handleUpdateStory = () => {
+        if (!storyUrl) {
+            toast({ title: "Error", description: "Please enter a valid image URL", variant: "destructive" });
+            return;
+        }
+
+        const newStory = {
+            content: storyUrl,
+            type: 'image',
+            active: true,
+            timestamp: Date.now()
+        };
+
+        localStorage.setItem("arrows_story_data", JSON.stringify(newStory));
+        localStorage.removeItem("arrows_story_seen"); // Reset seen status for everyone (locally at least)
+        setActiveStory({ content: storyUrl, active: true, timestamp: Date.now() });
+
+        toast({ title: "Story Updated", description: "New story is now live correctly!" });
+    };
+
+    const handleArchiveStory = () => {
+        if (!activeStory) return;
+
+        const newArchive = [activeStory, ...archive];
+        setArchive(newArchive);
+        localStorage.setItem("arrows_story_archive", JSON.stringify(newArchive));
+
+        // Clear active story without deleting distinct properties if I were to keep them, but here we just clear.
+        localStorage.removeItem("arrows_story_data");
+        setActiveStory(null);
+        setStoryUrl("");
+
+        toast({ title: "Story Archived", description: "Story moved to archive." });
+    };
+
+    const handleDeleteStory = () => {
+        localStorage.removeItem("arrows_story_data");
+        setActiveStory(null);
+        setStoryUrl("");
+        toast({ title: "Story Removed", description: "The story has been removed." });
+    };
+
+    // Project Handlers
+    const handleSaveProject = (e: React.FormEvent) => {
+        e.preventDefault();
+        const updatedProjects = editingProject.id
+            ? projects.map(p => p.id === editingProject.id ? editingProject : p)
+            : [...projects, { ...editingProject, id: Date.now() }];
+
+        setProjects(updatedProjects);
+        localStorage.setItem("arrows_projects_data", JSON.stringify(updatedProjects));
+
+        // Notify other components
+        window.dispatchEvent(new Event("project-update"));
+
+        setIsProjectSheetOpen(false);
+        setEditingProject(null);
+        toast({ title: "Success", description: "Project updated successfully." });
+    };
+
+    const handleDeleteProject = (id: number) => {
+        const updatedProjects = projects.filter(p => p.id !== id);
+        setProjects(updatedProjects);
+        localStorage.setItem("arrows_projects_data", JSON.stringify(updatedProjects));
+        window.dispatchEvent(new Event("project-update"));
+        toast({ title: "Deleted", description: "Project has been removed." });
+    };
+
+    const handleEditPageContent = async (id: number) => {
+        try {
+            const storedContent = await db.getItem<ProjectPageData>(`arrows_page_content_${id}`);
+            if (storedContent) {
+                setEditingPageContent(storedContent);
+            } else {
+                setEditingPageContent(defaultPageContent[id] || null);
+            }
+            setActivePageId(id);
+            setIsPageContentSheetOpen(true);
+        } catch (error) {
+            console.error("Failed to load page content", error);
+            // Fallback to default if error
+            setEditingPageContent(defaultPageContent[id] || null);
+            setActivePageId(id);
+            setIsPageContentSheetOpen(true);
+        }
+    };
+
+    const handleSavePageContent = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!activePageId || !editingPageContent) return;
+
+        try {
+            await db.setItem(`arrows_page_content_${activePageId}`, editingPageContent);
+            // Also dispatch global update just in case, though specific is better
+            window.dispatchEvent(new Event(`page-content-update-${activePageId}`));
+
+            setIsPageContentSheetOpen(false);
+            toast({ title: "Page Content Saved", description: "Changes are live on the project page." });
+        } catch (error) {
+            console.error("Failed to save content:", error);
+            toast({
+                variant: "destructive",
+                title: "Save Failed",
+                description: "Storage quota exceeded or error occurred."
+            });
+        }
+    };
 
     const handleSaveChanges = () => {
         setIsSaving(true);
@@ -91,10 +304,10 @@ export default function Dashboard() {
     ];
 
     const recentProjects = [
-        { id: 1, name: "Web Design Production", status: "In Review", path: "/projects/ecommerce-platform" },
-        { id: 2, name: "Video Editing Suite", status: "Updated", path: "/projects/mobile-app-design" },
-        { id: 3, name: "Graphic Design Brand", status: "Published", path: "/projects/brand-identity" },
-        { id: 4, name: "UI/UX Design System", status: "Active", path: "/projects/fintech-dashboard" },
+        { id: 1, name: "Web Design - Antigravity", status: "Published", path: "/projects/webdesign" },
+        { id: 2, name: "Video Editing Portfolio", status: "Active", path: "/projects/video-editing" },
+        { id: 3, name: "Identity - Graphic Design", status: "Published", path: "/projects/identity" },
+        { id: 4, name: "Human Centered Design (UX)", status: "Active", path: "/projects/ui-ux-design" },
     ];
 
     const activityHistory = [
@@ -253,7 +466,21 @@ export default function Dashboard() {
                                     </div>
                                 </SheetContent>
                             </Sheet>
-                            <Button variant="accent" className="gap-2 rounded-xl">
+                            <Button
+                                variant="accent"
+                                className="gap-2 rounded-xl"
+                                onClick={() => {
+                                    setEditingProject({
+                                        title: "",
+                                        category: "",
+                                        link: "/",
+                                        iconName: "Palette",
+                                        color: "from-gray-500/30 to-gray-500/5",
+                                        shapes: ["rounded-full", "rounded-lg", "rounded-full"]
+                                    });
+                                    setIsProjectSheetOpen(true);
+                                }}
+                            >
                                 <Plus className="w-4 h-4" />
                                 New Project
                             </Button>
@@ -299,6 +526,256 @@ export default function Dashboard() {
 
                         {/* Main Dashboard Area */}
                         <div className="lg:col-span-2 space-y-8">
+                            {/* Story Management Section */}
+                            <div className="glass-card p-8 animate-fade-up mb-8" style={{ animationDelay: '0.15s' }}>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 rounded-lg bg-pink-500/10 text-pink-500">
+                                        <Camera className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold">Story Management</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">Update the daily story visible to everyone on the Navbar.</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col md:flex-row gap-6">
+                                    <div className="flex-1 space-y-4">
+                                        <div className="space-y-4">
+                                            <Label htmlFor="story-url">Image Source</Label>
+
+                                            {/* Drop Zone */}
+                                            <div
+                                                className="border-2 border-dashed border-border/50 rounded-xl p-6 text-center hover:bg-accent/5 hover:border-accent/50 transition-colors cursor-pointer relative"
+                                                onDrop={handleFileChange}
+                                                onDragOver={handleDragOver}
+                                                onClick={() => document.getElementById('file-upload')?.click()}
+                                            >
+                                                <input
+                                                    type="file"
+                                                    id="file-upload"
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange}
+                                                />
+                                                <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                                                <p className="text-sm font-medium">Click or Drag & Drop to Upload</p>
+                                                <p className="text-xs text-muted-foreground mt-1">Supports JPG, PNG (Max 5MB)</p>
+                                            </div>
+
+                                            <div className="relative">
+                                                <div className="absolute inset-0 flex items-center">
+                                                    <span className="w-full border-t border-border/50" />
+                                                </div>
+                                                <div className="relative flex justify-center text-xs uppercase">
+                                                    <span className="bg-background px-2 text-muted-foreground">Or use URL</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <Input
+                                                    id="story-url"
+                                                    placeholder="https://example.com/story-image.jpg"
+                                                    value={storyUrl.length > 100 ? "(Image Data Loaded)" : storyUrl}
+                                                    onChange={(e) => setStoryUrl(e.target.value)}
+                                                />
+                                                <p className="text-xs text-muted-foreground">Enter a direct link or use the upload above.</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Button onClick={handleUpdateStory} className="bg-pink-600 hover:bg-pink-700">
+                                                Update Story
+                                            </Button>
+                                            {activeStory && (
+                                                <>
+                                                    <Button variant="outline" onClick={handleArchiveStory} className="text-indigo-500 hover:text-indigo-600 border-indigo-200 hover:bg-indigo-50">
+                                                        <History className="w-4 h-4 mr-2" />
+                                                        Archive
+                                                    </Button>
+                                                    <Button variant="outline" onClick={handleDeleteStory} className="text-rose-500 hover:text-rose-600 border-rose-200 hover:bg-rose-50">
+                                                        Remove
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {activeStory && (
+                                    <div className="w-full md:w-32 flex flex-col items-center gap-2">
+                                        <span className="text-xs font-medium text-muted-foreground">Current Story</span>
+                                        <div className="w-24 h-24 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-rose-500 to-purple-600">
+                                            <div className="w-full h-full rounded-full border-2 border-background overflow-hidden relative group cursor-pointer">
+                                                <img src={activeStory.content} alt="Current Story" className="w-full h-full object-cover" />
+                                            </div>
+                                        </div>
+                                        <span className="text-[10px] text-green-500 font-medium bg-green-500/10 px-2 py-0.5 rounded-full">Active</span>
+                                    </div>
+                                )}
+                            </div>
+
+
+
+                            {/* Archive Section */}
+                            {archive.length > 0 && (
+                                <div className="glass-card p-8 animate-fade-up mb-8" style={{ animationDelay: '0.2s' }}>
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+                                            <History className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-bold">Story Archive</h3>
+                                            <p className="text-sm text-muted-foreground mt-1">Past stories (automatically archived after 24h).</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                        {archive.map((story: any, idx: number) => (
+                                            <div key={idx} className="group relative aspect-square rounded-xl overflow-hidden border border-border/50">
+                                                <img src={story.content} alt="Archived Story" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                                                    <span className="text-[10px] text-white/80">Posted</span>
+                                                    <span className="text-xs font-medium text-white">
+                                                        {new Date(story.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                    </span>
+                                                    <span className="text-[10px] text-white/60">
+                                                        {new Date(story.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Portfolio Management Section */}
+                            <div className="glass-card p-8 animate-fade-up mb-8" style={{ animationDelay: '0.25s' }}>
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                                            <Palette className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-bold">Portfolio Management</h3>
+                                            <p className="text-sm text-muted-foreground mt-1">Update the projects displayed on the main landing page.</p>
+                                        </div>
+                                    </div>
+                                    <Button onClick={() => {
+                                        setEditingProject({
+                                            title: "",
+                                            category: "",
+                                            link: "/",
+                                            iconName: "Palette",
+                                            color: "from-gray-500/30 to-gray-500/5",
+                                            shapes: ["rounded-full", "rounded-lg", "rounded-full"]
+                                        });
+                                        setIsProjectSheetOpen(true);
+                                    }} className="gap-2">
+                                        <Plus className="w-4 h-4" /> Add Project
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {projects.map((project) => (
+                                        <div
+                                            key={project.id}
+                                            className="group flex items-center justify-between p-4 rounded-2xl bg-background/50 border border-border/10 hover:border-accent/40 transition-all duration-300"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${project.color} flex items-center justify-center`}>
+                                                    <LayoutDashboard className="w-6 h-6 text-white/70" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-semibold group-hover:text-accent transition-colors">{project.title}</h4>
+                                                    <span className="text-xs text-muted-foreground">{project.category}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                {defaultPageContent[project.id] && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50"
+                                                        onClick={() => handleEditPageContent(project.id)}
+                                                    >
+                                                        Edit Page
+                                                    </Button>
+                                                )}
+                                                <Button variant="ghost" size="sm" onClick={() => {
+                                                    setEditingProject(project);
+                                                    setIsProjectSheetOpen(true);
+                                                }}>Edit</Button>
+                                                <Button variant="ghost" size="icon" className="text-rose-500 hover:bg-rose-500/10" onClick={() => handleDeleteProject(project.id)}>
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Edit Project Sheet */}
+                            <Sheet open={isProjectSheetOpen} onOpenChange={setIsProjectSheetOpen}>
+                                <SheetContent className="overflow-y-auto">
+                                    <SheetHeader>
+                                        <SheetTitle>{editingProject?.id ? 'Edit Project' : 'Add New Project'}</SheetTitle>
+                                        <SheetDescription>
+                                            Changes will be reflected on the main page immediately.
+                                        </SheetDescription>
+                                    </SheetHeader>
+                                    {editingProject && (
+                                        <form onSubmit={handleSaveProject} className="space-y-6 mt-8">
+                                            <div className="space-y-2">
+                                                <Label>Title</Label>
+                                                <Input
+                                                    value={editingProject.title}
+                                                    onChange={e => setEditingProject({ ...editingProject, title: e.target.value })}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Category</Label>
+                                                <Input
+                                                    value={editingProject.category}
+                                                    onChange={e => setEditingProject({ ...editingProject, category: e.target.value })}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Link Path</Label>
+                                                <Input
+                                                    value={editingProject.link}
+                                                    onChange={e => setEditingProject({ ...editingProject, link: e.target.value })}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Icon</Label>
+                                                <select
+                                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    value={editingProject.iconName}
+                                                    onChange={e => setEditingProject({ ...editingProject, iconName: e.target.value })}
+                                                >
+                                                    {Object.keys(iconMap).map(key => (
+                                                        <option key={key} value={key}>{key}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Color Gradient (Tailwind Classes)</Label>
+                                                <Input
+                                                    value={editingProject.color}
+                                                    onChange={e => setEditingProject({ ...editingProject, color: e.target.value })}
+                                                    placeholder="from-rose-500/30 to-rose-500/5"
+                                                />
+                                            </div>
+                                            <Button type="submit" className="w-full bg-accent hover:bg-accent/90">
+                                                Save Project
+                                            </Button>
+                                        </form>
+                                    )}
+                                </SheetContent>
+                            </Sheet>
+
                             {/* Recent Projects Section */}
                             <div className="glass-card p-8 animate-fade-up" style={{ animationDelay: '0.2s' }}>
                                 <div className="flex items-center justify-between mb-8">
@@ -457,9 +934,237 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
-            </main>
+
+                {/* Page Content Editor Sheet */}
+                <Sheet open={isPageContentSheetOpen} onOpenChange={setIsPageContentSheetOpen}>
+                    <SheetContent className="overflow-y-auto sm:max-w-xl">
+                        <SheetHeader>
+                            <SheetTitle>Edit Page Content</SheetTitle>
+                            <SheetDescription>
+                                Customize the text and details of the project page.
+                            </SheetDescription>
+                        </SheetHeader>
+                        {editingPageContent && (
+                            <form onSubmit={handleSavePageContent} className="space-y-6 mt-6">
+                                {/* Hero Section */}
+                                <div className="space-y-4">
+                                    <h4 className="font-semibold border-b pb-2">Hero Section</h4>
+                                    <div className="space-y-2">
+                                        <Label>Hero Title</Label>
+                                        <Input
+                                            value={editingPageContent.heroTitle}
+                                            onChange={e => setEditingPageContent({ ...editingPageContent, heroTitle: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Hero Description</Label>
+                                        <Input
+                                            value={editingPageContent.heroDescription}
+                                            onChange={e => setEditingPageContent({ ...editingPageContent, heroDescription: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Hero Image</Label>
+                                        <div className="flex flex-col gap-3">
+                                            <Input
+                                                value={editingPageContent.heroImage || ""}
+                                                onChange={e => setEditingPageContent({ ...editingPageContent, heroImage: e.target.value })}
+                                                placeholder="https://... (URL)"
+                                            />
+                                            <div className="flex items-center gap-2">
+                                                <div className="relative flex-1">
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="cursor-pointer"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                if (file.size > 500 * 1024 * 1024) {
+                                                                    toast({
+                                                                        variant: "destructive",
+                                                                        title: "File too large",
+                                                                        description: "Image must be under 500MB."
+                                                                    });
+                                                                    return;
+                                                                }
+                                                                const reader = new FileReader();
+                                                                reader.onloadend = () => {
+                                                                    setEditingPageContent({ ...editingPageContent, heroImage: reader.result as string });
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs text-muted-foreground whitespace-nowrap">OR Upload File</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground">Top limit 500MB. Note: Browser storage limits (usually ~5MB) may prevent saving very large files.</p>
+                                    </div>
+                                </div>
+
+                                {/* Gallery Section */}
+                                <div className="space-y-4">
+                                    <h4 className="font-semibold border-b pb-2">Project Gallery</h4>
+
+                                    {/* Gallery Grid */}
+                                    {editingPageContent.gallery && editingPageContent.gallery.length > 0 && (
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {editingPageContent.gallery.map((img, idx) => (
+                                                <div key={idx} className="relative group aspect-video bg-muted rounded-md overflow-hidden">
+                                                    <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newGallery = [...(editingPageContent.gallery || [])];
+                                                            newGallery.splice(idx, 1);
+                                                            setEditingPageContent({ ...editingPageContent, gallery: newGallery });
+                                                        }}
+                                                        className="absolute top-1 right-1 p-1 bg-red-500/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <Trash2 className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Add Image Controls */}
+                                    <div className="space-y-3 p-3 border rounded-lg bg-muted/20">
+                                        <Label>Add New Image</Label>
+
+                                        {/* File Upload */}
+                                        <div className="flex items-center gap-2">
+                                            <div className="relative flex-1">
+                                                <Input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="cursor-pointer"
+                                                    key={editingPageContent.gallery?.length}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            if (file.size > 500 * 1024 * 1024) {
+                                                                toast({ variant: "destructive", title: "File too large", description: "Limit is 500MB" });
+                                                                return;
+                                                            }
+                                                            const reader = new FileReader();
+                                                            reader.onloadend = () => {
+                                                                const newGallery = [...(editingPageContent.gallery || []), reader.result as string];
+                                                                setEditingPageContent({ ...editingPageContent, gallery: newGallery });
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="text-xs text-muted-foreground whitespace-nowrap">Upload</span>
+                                        </div>
+
+                                        <div className="text-center text-xs text-muted-foreground">- OR -</div>
+
+                                        {/* URL Input */}
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="Image URL..."
+                                                id="gallery-url-input"
+                                            />
+                                            <Button type="button" size="sm" variant="outline" onClick={() => {
+                                                const input = document.getElementById('gallery-url-input') as HTMLInputElement;
+                                                if (input && input.value) {
+                                                    const newGallery = [...(editingPageContent.gallery || []), input.value];
+                                                    setEditingPageContent({ ...editingPageContent, gallery: newGallery });
+                                                    input.value = "";
+                                                }
+                                            }}>
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Challenge & Solution */}
+                                <div className="space-y-4">
+                                    <h4 className="font-semibold border-b pb-2">Case Study Details</h4>
+                                    <div className="space-y-2">
+                                        <Label>The Challenge</Label>
+                                        <textarea
+                                            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            value={editingPageContent.challenge}
+                                            onChange={e => setEditingPageContent({ ...editingPageContent, challenge: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>The Solution</Label>
+                                        <textarea
+                                            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            value={editingPageContent.solution}
+                                            onChange={e => setEditingPageContent({ ...editingPageContent, solution: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Metadata */}
+                                <div className="space-y-4">
+                                    <h4 className="font-semibold border-b pb-2">Project Metadata</h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label>Role</Label>
+                                            <Input
+                                                value={editingPageContent.role}
+                                                onChange={e => setEditingPageContent({ ...editingPageContent, role: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Timeline</Label>
+                                            <Input
+                                                value={editingPageContent.timeline}
+                                                onChange={e => setEditingPageContent({ ...editingPageContent, timeline: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Tools</Label>
+                                            <Input
+                                                value={editingPageContent.tools}
+                                                onChange={e => setEditingPageContent({ ...editingPageContent, tools: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Year</Label>
+                                            <Input
+                                                value={editingPageContent.year}
+                                                onChange={e => setEditingPageContent({ ...editingPageContent, year: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Features */}
+                                <div className="space-y-4">
+                                    <h4 className="font-semibold border-b pb-2">Key Features</h4>
+                                    <div className="space-y-2">
+                                        <Label>Features List (One per line)</Label>
+                                        <textarea
+                                            className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            value={editingPageContent.features?.join('\n')}
+                                            onChange={e => setEditingPageContent({ ...editingPageContent, features: e.target.value.split('\n') })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 flex gap-3">
+                                    <Button type="button" variant="outline" onClick={() => setIsPageContentSheetOpen(false)} className="flex-1">Cancel</Button>
+                                    <Button type="submit" variant="accent" className="flex-1">Save Page Content</Button>
+                                </div>
+                            </form>
+                        )}
+                    </SheetContent>
+                </Sheet>
+            </main >
 
             <Footer />
-        </div>
+        </div >
     );
 }

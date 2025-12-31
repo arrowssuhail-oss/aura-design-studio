@@ -4,27 +4,19 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
     CreditCard,
-    Check,
-    ChevronRight,
     History,
     ArrowLeft,
     ShieldCheck,
-    Zap,
     Download,
     Lock,
-    QrCode,
     Loader2,
     CheckCircle2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import {
     Dialog,
     DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -45,7 +37,7 @@ export default function Payments() {
                         <Lock className="w-16 h-16 text-accent mx-auto mb-6" />
                         <h1 className="text-3xl font-bold mb-4">Login Required</h1>
                         <p className="text-muted-foreground mb-8">
-                            Please sign in to manage your studio subscriptions, billing methods, and download your premium assets.
+                            Please sign in to manage your payments and download your premium assets.
                         </p>
                         <div className="flex flex-col gap-3">
                             <Button variant="accent" onClick={() => navigate("/login")} className="w-full h-12 rounded-xl text-lg font-bold shadow-lg shadow-accent/20">
@@ -109,12 +101,12 @@ export default function Payments() {
         }
 
         const options = {
-            "key": import.meta.env.VITE_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
+            "key": "rzp_test_RxTshfO6pZ1vrx", // Enter the Key ID generated from the Dashboard
             "amount": "50000", // Amount is in currency subunits. Default currency is INR.
             "currency": "INR",
             "name": "Arrows Design",
             "description": "Test Transaction",
-            "image": "https://example.com/your_logo",
+            "image": "https://arrowsdesign.com/your_logo",
             "handler": function (response: any) {
                 toast({
                     title: "Payment Successful",
@@ -139,37 +131,7 @@ export default function Payments() {
     };
 
     const plans = [
-        {
-            id: "pro",
-            name: "Pro",
-            price: "$29",
-            description: "Perfect for independent creators",
-            features: ["5 Active Projects", "10GB Storage", "Basic Assets", "Email Support"],
-            icon: Zap,
-            color: "text-blue-500",
-            bg: "bg-blue-500/10"
-        },
-        {
-            id: "studio",
-            name: "Studio",
-            price: "$99",
-            description: "For growing design teams",
-            features: ["Unlimited Projects", "100GB Storage", "Premium Assets", "Priority Support", "Custom Branding"],
-            icon: ShieldCheck,
-            color: "text-accent",
-            bg: "bg-accent/10",
-            popular: true
-        },
-        {
-            id: "enterprise",
-            name: "Enterprise",
-            price: "Custom",
-            description: "Scale your creative operations",
-            features: ["Unlimited Everything", "SSO/SAML", "Dedicated Support", "API Access"],
-            icon: Lock,
-            color: "text-emerald-500",
-            bg: "bg-emerald-500/10"
-        }
+
     ];
 
     const transactions = [
@@ -195,41 +157,24 @@ export default function Payments() {
 
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                         <div>
-                            <span className="text-accent text-sm font-medium uppercase tracking-widest">Billing & Subscription</span>
-                            <h1 className="text-4xl md:text-5xl font-bold mt-2">Manage Studio Access</h1>
-                            <p className="text-muted-foreground mt-2">Choose the right plan for your creative needs.</p>
+                            <span className="text-accent text-sm font-medium uppercase tracking-widest">Payments & Billing</span>
+                            <h1 className="text-4xl md:text-5xl font-bold mt-2">Manage Payments</h1>
                         </div>
                     </div>
 
 
                     <div className="grid lg:grid-cols-2 gap-8">
                         {/* Payment Method */}
-                        <div className="glass-card p-8">
+                        <div className="glass-card p-6 h-fit">
                             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                                 <CreditCard className="w-6 h-6 text-accent" />
                                 Payment Method
                             </h3>
-
-                            <div className="p-6 rounded-2xl bg-background/50 border border-border/10 flex items-center justify-between mb-8 group hover:border-white/20 transition-all">
-                                <div className="flex items-center gap-6">
-                                    <div className="w-16 h-10 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
-                                        <div className="w-24 bg-gradient-to-r from-blue-600 to-indigo-600 py-1 text-[8px] font-black italic text-center text-white relative rotate-12 -translate-y-1">
-                                            VISA
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p className="font-bold">•••• •••• •••• 4242</p>
-                                        <p className="text-xs text-muted-foreground">Expires 12/28</p>
-                                    </div>
-                                </div>
-                                <Button variant="ghost" className="text-accent underline">Edit</Button>
-                            </div>
-
                             <Button
                                 onClick={handleRazorpayPayment}
-                                className="w-full h-12 rounded-xl bg-[#3399cc] hover:bg-[#2b88b6] text-white transition-all font-bold"
+                                className="w-full h-12 rounded-xl bg-[#3399cc] hover:bg-[#2b88b6] text-white transition-all font-bold flex items-center justify-center gap-2"
                             >
-                                Pay with Razorpay
+                                <img src="/razorpay-logo.png" alt="Razorpay" className="h-6 w-auto" />
                             </Button>
                         </div>
 
