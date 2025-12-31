@@ -147,24 +147,37 @@ export default function Dashboard() {
         e.preventDefault();
     };
 
-    const handleUpdateStory = () => {
-        if (!storyUrl) {
-            toast({ title: "Error", description: "Please enter a valid image URL", variant: "destructive" });
-            return;
-        }
+    const handleUpdateStory = async () => {
+        if (!storyUrl) return;
 
-        const newStory = {
+        const storyData = {
             content: storyUrl,
-            type: 'image',
-            active: true,
-            timestamp: Date.now()
+            type: 'image' as const,
+            timestamp: Date.now(),
+            active: true
         };
 
-        localStorage.setItem("arrows_story_data", JSON.stringify(newStory));
-        localStorage.removeItem("arrows_story_seen"); // Reset seen status for everyone (locally at least)
-        setActiveStory({ content: storyUrl, active: true, timestamp: Date.now() });
+        try {
+            // Local update
+            localStorage.setItem("arrows_story_data", JSON.stringify(storyData));
 
-        toast({ title: "Story Updated", description: "New story is now live correctly!" });
+            // GitHub Sync
+            toast({ title: "Syncing Story...", description: "Uploading to GitHub." });
+            const response = await fetch('http://localhost:3001/api/sync-github', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: { heroImage: storyUrl }, pageId: 'story' }) // Hack to reuse image processing
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                toast({ title: "Story Live!", description: "Updated and pushed to GitHub." });
+            }
+
+            window.location.reload();
+        } catch (error) {
+            console.error("Story update failed", error);
+        }
     };
 
     const handleArchiveStory = () => {
@@ -190,21 +203,57 @@ export default function Dashboard() {
     };
 
     // Project Handlers
-    const handleSaveProject = (e: React.FormEvent) => {
+    const handleSaveProject = async (e: React.FormEvent) => {
         e.preventDefault();
-        const updatedProjects = editingProject.id
-            ? projects.map(p => p.id === editingProject.id ? editingProject : p)
-            : [...projects, { ...editingProject, id: Date.now() }];
+        setIsSaving(true);
 
-        setProjects(updatedProjects);
-        localStorage.setItem("arrows_projects_data", JSON.stringify(updatedProjects));
+        try {
+            // 1. Prepare data
+            const projectId = editingProject.id || Date.now();
+            const projectToSave = { ...editingProject, id: projectId };
 
-        // Notify other components
-        window.dispatchEvent(new Event("project-update"));
+            // 2. Sync to GitHub (Automatic Upload)
+            toast({ title: "Syncing Project...", description: "Uploading assets to GitHub." });
+            const response = await fetch('http://localhost:3001/api/sync-github', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: { heroImage: projectToSave.image }, // Reuse logic to save single image
+                    pageId: `project_${projectId}`
+                })
+            });
 
-        setIsProjectSheetOpen(false);
-        setEditingProject(null);
-        toast({ title: "Success", description: "Project updated successfully." });
+            const result = await response.json();
+            if (result.success) {
+                // Update image path with synced one
+                projectToSave.image = result.updatedContent.heroImage;
+
+                const updatedProjects = editingProject.id
+                    ? projects.map(p => p.id === editingProject.id ? projectToSave : p)
+                    : [...projects, projectToSave];
+
+                // 3. Sync Full Project List to GitHub
+                await fetch('http://localhost:3001/api/sync-github', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: updatedProjects, pageId: 'main_projects' })
+                });
+
+                setProjects(updatedProjects);
+                localStorage.setItem("arrows_projects_data", JSON.stringify(updatedProjects)); // Changed to arrows_projects_data
+                window.dispatchEvent(new Event("project-update")); // Notify other components
+                setIsProjectSheetOpen(false);
+                setEditingProject(null); // Clear editing project
+                toast({ title: "Sync Complete", description: "Project list and image are on GitHub!" });
+            } else {
+                throw new Error(result.error || "Unknown error during sync.");
+            }
+        } catch (error) {
+            console.error("Project sync failed", error);
+            toast({ variant: "destructive", title: "Sync Failed", description: "Check server connection or storage." });
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleDeleteProject = (id: number) => {
@@ -239,12 +288,29 @@ export default function Dashboard() {
         if (!activePageId || !editingPageContent) return;
 
         try {
+            // 1. Local State Update
             await db.setItem(`arrows_page_content_${activePageId}`, editingPageContent);
-            // Also dispatch global update just in case, though specific is better
-            window.dispatchEvent(new Event(`page-content-update-${activePageId}`));
 
+            // 2. GitHub Sync (Automatic Upload)
+            toast({ title: "Syncing...", description: "Uploading assets and pushing to GitHub." });
+            const response = await fetch('http://localhost:3001/api/sync-github', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: editingPageContent, pageId: activePageId })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                // Update local storage with the new file paths (instead of base64)
+                await db.setItem(`arrows_page_content_${activePageId}`, result.updatedContent);
+                setEditingPageContent(result.updatedContent);
+                toast({ title: "Sync Complete", description: "All changes are on GitHub!" });
+            } else {
+                throw new Error(result.error);
+            }
+
+            window.dispatchEvent(new Event(`page-content-update-${activePageId}`));
             setIsPageContentSheetOpen(false);
-            toast({ title: "Page Content Saved", description: "Changes are live on the project page." });
         } catch (error) {
             console.error("Failed to save content:", error);
             toast({
@@ -768,8 +834,46 @@ export default function Dashboard() {
                                                     placeholder="from-rose-500/30 to-rose-500/5"
                                                 />
                                             </div>
-                                            <Button type="submit" className="w-full bg-accent hover:bg-accent/90">
-                                                Save Project
+
+                                            {/* Project Cover Image */}
+                                            <div className="space-y-2">
+                                                <Label>Project Cover Image (Slideshow/Card)</Label>
+                                                <div className="flex flex-col gap-3">
+                                                    <Input
+                                                        value={editingProject.image || ""}
+                                                        onChange={e => setEditingProject({ ...editingProject, image: e.target.value })}
+                                                        placeholder="https://... (URL)"
+                                                    />
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="relative flex-1">
+                                                            <Input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="cursor-pointer"
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) {
+                                                                        const reader = new FileReader();
+                                                                        reader.onloadend = () => {
+                                                                            setEditingProject({ ...editingProject, image: reader.result as string });
+                                                                        };
+                                                                        reader.readAsDataURL(file);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <span className="text-xs text-muted-foreground whitespace-nowrap">Upload Image</span>
+                                                    </div>
+                                                </div>
+                                                {editingProject.image && (
+                                                    <div className="mt-2 aspect-video rounded-lg overflow-hidden border border-border/10">
+                                                        <img src={editingProject.image} alt="Preview" className="w-full h-full object-cover" />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={isSaving}>
+                                                {isSaving ? "Saving & Syncing..." : "Save Project"}
                                             </Button>
                                         </form>
                                     )}

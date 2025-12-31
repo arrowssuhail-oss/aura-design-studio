@@ -203,13 +203,19 @@ const ProjectCard = ({ project }: { project: any }) => {
 };
 
 const ProjectsSection = () => {
-  const [projects, setProjects] = useState<any[]>(defaultProjects);
+  const [projects, setProjects] = useState<any[]>(() => {
+    const stored = localStorage.getItem("arrows_projects_data");
+    return stored ? JSON.parse(stored) : defaultProjects;
+  });
 
   useEffect(() => {
     const loadProjectImages = async () => {
       try {
+        // Use the list from state/localStorage
+        const currentProjects = projects.length > 0 ? projects : defaultProjects;
+
         const updatedProjects = await Promise.all(
-          defaultProjects.map(async (project) => {
+          currentProjects.map(async (project) => {
             const content = await db.getItem<any>(`arrows_page_content_${project.id}`);
             if (content) {
               // Collect valid images: Hero + Gallery
@@ -242,15 +248,23 @@ const ProjectsSection = () => {
     loadProjectImages();
 
     // Listen for updates
-    const handleUpdate = () => loadProjectImages();
+    const handleUpdate = () => {
+      const stored = localStorage.getItem("arrows_projects_data");
+      if (stored) {
+        setProjects(JSON.parse(stored));
+      }
+      loadProjectImages();
+    };
     window.addEventListener('project-update', handleUpdate);
-    defaultProjects.forEach(p => {
+
+    const projectList = projects.length > 0 ? projects : defaultProjects;
+    projectList.forEach(p => {
       window.addEventListener(`page-content-update-${p.id}`, handleUpdate);
     });
 
     return () => {
       window.removeEventListener('project-update', handleUpdate);
-      defaultProjects.forEach(p => {
+      projectList.forEach(p => {
         window.removeEventListener(`page-content-update-${p.id}`, handleUpdate);
       });
     };
