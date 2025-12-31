@@ -23,6 +23,8 @@ export const defaultProjects = [
     iconName: "Palette",
     shapes: ["rounded-full", "rounded-lg", "rounded-full"],
     link: "/projects/identity",
+    image: "/projects/graphic-design/slide1.png",
+    images: ["/projects/graphic-design/slide1.png", "/projects/graphic-design/slide2.png"],
   },
   {
     id: 2,
