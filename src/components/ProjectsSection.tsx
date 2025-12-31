@@ -274,8 +274,9 @@ const ProjectsSection = () => {
     <section id="works" className="py-20">
       <div className="px-6 md:px-12 max-w-[1400px] mx-auto">
         <div className="header-container mb-12" data-aos="fade-up">
+          <span className="text-accent text-sm font-medium uppercase tracking-widest block mb-4">Projects</span>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Selected <span className="text-muted-foreground">Works</span>
+            Selected <span className="text-accent">Works</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl">
             A showcased selection of projects that demonstrate my passion for creating intuitive and impactful digital experiences.
