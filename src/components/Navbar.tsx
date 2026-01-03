@@ -3,15 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.png";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { LogIn, LogOut, User, UserCircle } from "lucide-react";
+import { LogIn, LogOut, User, UserCircle, LayoutDashboard } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+
 import StoryViewer from "@/components/StoryViewer";
 const navLinks = [{
   name: "About",
@@ -30,6 +32,7 @@ const navLinks = [{
   href: "/#contact"
 }];
 const Navbar = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
@@ -150,50 +153,27 @@ const Navbar = () => {
                 Let's Talk
               </Button>
             </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="ghost" className="gap-2 text-foreground/80 hover:text-foreground">
                   <UserCircle className="w-5 h-5" />
-                  <span>{user ? "Account" : "Sign In / Up"}</span>
+                  <span>Sign In / Up</span>
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 glass-card border-border/50 animate-fade-in">
-                {user ? (
-                  <>
-                    <div className="px-2 py-1.5 text-xs text-muted-foreground border-b border-border/50 mb-1">
-                      Logged in as <br /><span className="text-foreground font-medium">{user.email}</span>
-                    </div>
-                    {user.email === "arrows.suhail@gmail.com" && (
-                      <Link to="/dashboard">
-                        <DropdownMenuItem className="gap-2">
-                          <User className="w-4 h-4" />
-                          Dashboard
-                        </DropdownMenuItem>
-                      </Link>
-                    )}
-                    <DropdownMenuItem onClick={logout} className="gap-2 text-rose-500 focus:text-rose-500">
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </DropdownMenuItem>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/login">
-                      <DropdownMenuItem className="gap-2">
-                        <LogIn className="w-4 h-4" />
-                        Sign In
-                      </DropdownMenuItem>
-                    </Link>
-                    <Link to="/signup">
-                      <DropdownMenuItem className="gap-2">
-                        <UserCircle className="w-4 h-4" />
-                        Sign Up
-                      </DropdownMenuItem>
-                    </Link>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/">
+                <UserButton.MenuItems>
+                  {user?.email === "arrows.suhail@gmail.com" && (
+                    <UserButton.Action
+                      label="Dashboard"
+                      labelIcon={<LayoutDashboard className="w-4 h-4" />}
+                      onClick={() => navigate("/dashboard")}
+                    />
+                  )}
+                </UserButton.MenuItems>
+              </UserButton>
+            </SignedIn>
           </div>
 
           {/* Mobile menu button */}
@@ -214,56 +194,56 @@ const Navbar = () => {
               </Button>
             </Link>
             <div className="border-t border-border/50 pt-4 mt-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-between gap-2 px-0 hover:bg-transparent"
-                onClick={() => setIsMobileAccountOpen(!isMobileAccountOpen)}
-              >
-                <div className="flex items-center gap-2">
-                  <UserCircle className="w-5 h-5 text-accent" />
-                  <span className="font-medium">{user ? "Account" : "Sign In / Up"}</span>
-                </div>
-                <Menu className={cn("w-4 h-4 transition-transform", isMobileAccountOpen ? "rotate-90" : "")} />
-              </Button>
+              <SignedOut>
+                <div className="w-full">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-between gap-2 px-0 hover:bg-transparent"
+                    onClick={() => setIsMobileAccountOpen(!isMobileAccountOpen)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <UserCircle className="w-5 h-5 text-accent" />
+                      <span className="font-medium">Sign In / Up</span>
+                    </div>
+                    <Menu className={cn("w-4 h-4 transition-transform", isMobileAccountOpen ? "rotate-90" : "")} />
+                  </Button>
 
-              {isMobileAccountOpen && (
-                <div className="flex flex-col gap-2 mt-4 pl-4 animate-fade-down">
-                  {user ? (
-                    <>
-                      <div className="text-xs text-muted-foreground mb-1">
-                        Logged in as <span className="text-foreground">{user.email}</span>
-                      </div>
-                      {user.email === "arrows.suhail@gmail.com" && (
-                        <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button variant="ghost" className="gap-2 w-full justify-start mt-1">
-                            <User className="w-4 h-4" />
-                            Dashboard
-                          </Button>
-                        </Link>
-                      )}
-                      <Button variant="ghost" onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="gap-2 w-full justify-start text-rose-500 hover:text-rose-500 hover:bg-rose-500/5">
-                        <LogOut className="w-4 h-4" />
-                        Sign Out
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="ghost" className="gap-2 w-full justify-start">
+                  {isMobileAccountOpen && (
+                    <div className="flex flex-col gap-2 mt-2 pl-4 animate-fade-down border-l-2 border-border/50 ml-2">
+                      <SignInButton mode="modal">
+                        <Button variant="ghost" className="w-full justify-start gap-2 h-10 font-normal hover:bg-muted/50">
                           <LogIn className="w-4 h-4" />
                           Sign In
                         </Button>
-                      </Link>
-                      <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="accent" className="w-full justify-start gap-2">
+                      </SignInButton>
+                      <SignUpButton mode="modal">
+                        <Button variant="ghost" className="w-full justify-start gap-2 h-10 font-normal hover:bg-muted/50">
                           <UserCircle className="w-4 h-4" />
                           Sign Up
                         </Button>
-                      </Link>
-                    </>
+                      </SignUpButton>
+                    </div>
                   )}
                 </div>
-              )}
+              </SignedOut>
+              <SignedIn>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-4 px-2 py-2">
+                    <UserButton afterSignOutUrl="/">
+                      <UserButton.MenuItems>
+                        {user?.email === "arrows.suhail@gmail.com" && (
+                          <UserButton.Action
+                            label="Dashboard"
+                            labelIcon={<LayoutDashboard className="w-4 h-4" />}
+                            onClick={() => navigate("/dashboard")}
+                          />
+                        )}
+                      </UserButton.MenuItems>
+                    </UserButton>
+                    <span className="text-sm font-medium">Account</span>
+                  </div>
+                </div>
+              </SignedIn>
             </div>
           </div>
         </div>}

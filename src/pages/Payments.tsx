@@ -19,6 +19,7 @@ import {
     DialogContent,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import ReceiptModal from "@/components/ReceiptModal";
 
 export default function Payments() {
     const { user } = useAuth();
@@ -27,6 +28,16 @@ export default function Payments() {
     const [selectedPlan, setSelectedPlan] = useState<string>("studio");
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [paymentStep, setPaymentStep] = useState<"qr" | "processing" | "success">("qr");
+    const [viewingReceipt, setViewingReceipt] = useState<any | null>(null);
+    const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+    const [transactions, setTransactions] = useState(() => {
+        const saved = localStorage.getItem("aura_transactions");
+        return saved ? JSON.parse(saved) : [
+            { id: "INV-2025-001", date: "Dec 20, 2025", amount: "$99.00", status: "Paid", description: "Studio Plan - Monthly" },
+            { id: "INV-2025-002", date: "Nov 20, 2025", amount: "$99.00", status: "Paid", description: "Studio Plan - Monthly" },
+            { id: "INV-2025-003", date: "Oct 20, 2025", amount: "$99.00", status: "Paid", description: "Studio Plan - Monthly" }
+        ];
+    });
 
     if (!user) {
         return (
@@ -60,10 +71,24 @@ export default function Payments() {
         setPaymentStep("qr");
     };
 
+    const addTransaction = (id: string, amount: string, description: string = "Premium Digital Asset Pack") => {
+        const newTx = {
+            id,
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            amount,
+            status: "Paid",
+            description
+        };
+        const updated = [newTx, ...transactions];
+        setTransactions(updated);
+        localStorage.setItem("aura_transactions", JSON.stringify(updated));
+    };
+
     const simulatePayment = () => {
         setPaymentStep("processing");
         setTimeout(() => {
             setPaymentStep("success");
+            addTransaction(`SIM-${Math.random().toString(36).substr(2, 9).toUpperCase()}`, "INR 1.00", "Premium Digital Asset Pack");
             toast({
                 title: "Payment Successful",
                 description: "Your transaction has been processed and your asset is ready for download.",
@@ -101,17 +126,20 @@ export default function Payments() {
         }
 
         const options = {
-            "key": "rzp_test_RxTshfO6pZ1vrx", // Enter the Key ID generated from the Dashboard
-            "amount": "50000", // Amount is in currency subunits. Default currency is INR.
+            "key": import.meta.env.VITE_RAZORPAY_KEY_ID, // Use environment variable for Key ID
+            "amount": "100", // Amount is in currency subunits. 100 = 1 INR
             "currency": "INR",
             "name": "Arrows Design",
-            "description": "Test Transaction",
+            "description": "Payment for Assets",
             "image": "https://arrowsdesign.com/your_logo",
             "handler": function (response: any) {
                 toast({
                     title: "Payment Successful",
                     description: `Payment ID: ${response.razorpay_payment_id}`,
                 });
+                addTransaction(response.razorpay_payment_id, "INR 1.00", "Premium Digital Asset Pack");
+                setPaymentStep("success");
+                setIsPaymentModalOpen(true);
             },
             "prefill": {
                 "name": user?.name || "Test User",
@@ -132,12 +160,6 @@ export default function Payments() {
 
     const plans = [
 
-    ];
-
-    const transactions = [
-        { id: "INV-2025-001", date: "Dec 20, 2025", amount: "$99.00", status: "Paid" },
-        { id: "INV-2025-002", date: "Nov 20, 2025", amount: "$99.00", status: "Paid" },
-        { id: "INV-2025-003", date: "Oct 20, 2025", amount: "$99.00", status: "Paid" }
     ];
 
     return (
@@ -185,7 +207,20 @@ export default function Payments() {
                                     <History className="w-6 h-6 text-accent" />
                                     Billing History
                                 </h3>
-                                <Button variant="link" className="text-accent p-0">Receipts</Button>
+                                <Button
+                                    variant="link"
+                                    className="text-accent p-0"
+                                    onClick={() => {
+                                        if (transactions.length > 0) {
+                                            setViewingReceipt(transactions[0]);
+                                            setIsReceiptModalOpen(true);
+                                        } else {
+                                            toast({ description: "No receipts available yet." });
+                                        }
+                                    }}
+                                >
+                                    Receipts
+                                </Button>
                             </div>
 
                             <div className="space-y-2">
@@ -202,7 +237,14 @@ export default function Payments() {
                                                     {tx.status}
                                                 </span>
                                             </div>
-                                            <button className="p-2 rounded-lg bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent/20">
+                                            <button
+                                                onClick={() => {
+                                                    setViewingReceipt(tx);
+                                                    setIsReceiptModalOpen(true);
+                                                }}
+                                                className="p-2 rounded-lg bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent/20"
+                                                title="View Receipt"
+                                            >
                                                 <Download className="w-4 h-4 text-accent" />
                                             </button>
                                         </div>
@@ -211,6 +253,13 @@ export default function Payments() {
                             </div>
                         </div>
                     </div>
+
+                    <ReceiptModal
+                        isOpen={isReceiptModalOpen}
+                        onClose={() => setIsReceiptModalOpen(false)}
+                        transaction={viewingReceipt}
+                        user={user}
+                    />
 
                     {/* Razorpay Simulation Modal */}
                     <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
@@ -225,7 +274,7 @@ export default function Payments() {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs opacity-70">Amount</p>
-                                    <p className="font-bold">{plans.find(p => p.id === selectedPlan)?.price || "$99"}</p>
+                                    <p className="font-bold">{plans.find(p => p.id === selectedPlan)?.price || "INR 1"}</p>
                                 </div>
                             </div>
 
@@ -236,7 +285,7 @@ export default function Payments() {
                                             <div className="bg-white p-2 rounded-xl shadow-xl border-2 border-slate-100 overflow-hidden">
                                                 <img
                                                     src="/qr-code.png"
-                                                    alt="Razorpay QR"
+                                                    alt="Razorpay QR: qr_RyWSmMCzM5LRYc"
                                                     className="w-48 h-48 object-cover"
                                                 />
                                             </div>

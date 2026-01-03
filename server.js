@@ -98,6 +98,8 @@ app.post('/api/sync-github', async (req, res) => {
         let contentPath;
         if (pageId === 'main_projects') {
             contentPath = path.join(dataDir, 'projects.json');
+        } else if (pageId === 'users') {
+            contentPath = path.join(dataDir, 'users.json');
         } else {
             contentPath = path.join(dataDir, `content_${pageId}.json`);
         }

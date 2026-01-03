@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
-    User,
+    User as UserIcon,
     Settings,
     LayoutDashboard,
     FolderLock,
@@ -21,7 +21,8 @@ import {
     Upload,
     Palette
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
+import UserDashboard from "./UserDashboard";
 import { useToast } from "@/components/ui/use-toast";
 import { db } from "@/lib/storage";
 import {
@@ -44,7 +45,63 @@ export default function Dashboard() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { toast } = useToast();
-    const [displayName, setDisplayName] = useState(user?.name || user?.email.split('@')[0] || "");
+
+    // 1. Role & Access State (Hoisted)
+    const [isAdminState, setIsAdminState] = useState(false);
+    const [isLoadingRole, setIsLoadingRole] = useState(true);
+
+    // Auto-Register & Role Check
+    useEffect(() => {
+        if (!user) return;
+
+        const checkRoleAndRegister = async () => {
+            if (user.email === "arrows.suhail@gmail.com") {
+                setIsAdminState(true);
+                setIsLoadingRole(false);
+                return;
+            }
+
+            try {
+                // Fetch Centralized User Data
+                const response = await import("@/data/users.json");
+                const allUsers = response.users || {};
+
+                // If user exists, just load
+                if (allUsers[user.id]) {
+                    setIsAdminState(false);
+                    setIsLoadingRole(false);
+                    return;
+                }
+
+                // If NEW user, Auto-Register via API
+                const newUser = {
+                    email: user.email,
+                    role: 'user',
+                    stats: { downloads: 0, spent: 0 },
+                    transactions: [],
+                    downloads: []
+                };
+
+                // Sync new user to GitHub/Backend
+                const updatedUsers = { ...allUsers, [user.id]: newUser };
+                await fetch('http://localhost:3001/api/sync-github', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: { users: updatedUsers }, pageId: 'users' })
+                });
+
+                setIsAdminState(false);
+            } catch (error) {
+                console.error("Failed during user registration:", error);
+            } finally {
+                setIsLoadingRole(false);
+            }
+        };
+
+        checkRoleAndRegister();
+    }, [user]);
+
+    const [displayName, setDisplayName] = useState(user?.name || (user?.email ? user.email.split('@')[0] : "") || "");
     const [isSaving, setIsSaving] = useState(false);
     const [projectUpdates, setProjectUpdates] = useState(true);
     const [securityAlerts, setSecurityAlerts] = useState(true);
@@ -64,54 +121,99 @@ export default function Dashboard() {
     const [activePageId, setActivePageId] = useState<number | null>(null);
     const [isPageContentSheetOpen, setIsPageContentSheetOpen] = useState(false);
 
-    // Load initial story state & Archive
-    useState(() => {
-        // Load Archive
-        const storedArchive = localStorage.getItem("arrows_story_archive");
-        if (storedArchive) {
-            setArchive(JSON.parse(storedArchive));
-        }
+    // Admin: User Management State
+    const [adminUsers, setAdminUsers] = useState<any>({});
+    const [selectedUser, setSelectedUser] = useState<string | null>(null);
+    const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
 
-        // Load Active Story
-        const stored = localStorage.getItem("arrows_story_data");
-        if (stored) {
-            const parsed = JSON.parse(stored);
+    // Load Users for Admin
+    useEffect(() => {
+        if (!isAdminState) return;
 
-            // Auto Archive if expired (> 24h)
-            const isExpired = Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000;
-
-            if (parsed.active && !isExpired) {
-                setActiveStory(parsed);
-                setStoryUrl(parsed.content);
-            } else if (parsed.active && isExpired) {
-                // Move to archive
-                const newArchive = [parsed, ...(storedArchive ? JSON.parse(storedArchive) : [])];
-                localStorage.setItem("arrows_story_archive", JSON.stringify(newArchive));
-                setArchive(newArchive);
-
-                // Deactivate current
-                localStorage.removeItem("arrows_story_data");
-                setActiveStory(null);
-                setStoryUrl("");
-
-                toast({ title: "Story Archived", description: "Previous story expired and moved to archive." });
+        const loadContent = async () => {
+            try {
+                const response = await import("@/data/users.json");
+                setAdminUsers(response.users || {});
+            } catch (e) {
+                console.error("Failed to load users", e);
             }
+        };
+        loadContent();
+    }, [isAdminState]);
+
+    const handleUpdateUser = async (userId: string, newData: any) => {
+        const updatedUsers = { ...adminUsers, [userId]: newData };
+        setAdminUsers(updatedUsers);
+
+        // Sync to Backend
+        try {
+            await fetch('http://localhost:3001/api/sync-github', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: { users: updatedUsers }, pageId: 'users' })
+            });
+            toast({ title: "User Updated", description: "Changes synced to GitHub." });
+            setIsUserSheetOpen(false);
+        } catch (e) {
+            console.error("Sync failed", e);
+            toast({ variant: "destructive", title: "Update Failed", description: "See console." });
         }
-    });
+    };
+
+    // Load initial story state & Archive
+    // Load initial story state & Archive
+    useEffect(() => {
+        try {
+            // Load Archive
+            const storedArchive = localStorage.getItem("arrows_story_archive");
+            if (storedArchive) {
+                setArchive(JSON.parse(storedArchive));
+            }
+
+            // Load Active Story
+            const stored = localStorage.getItem("arrows_story_data");
+            if (stored) {
+                const parsed = JSON.parse(stored);
+
+                // Auto Archive if expired (> 24h)
+                const isExpired = Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000;
+
+                if (parsed.active && !isExpired) {
+                    setActiveStory(parsed);
+                    setStoryUrl(parsed.content);
+                } else if (parsed.active && isExpired) {
+                    // Move to archive
+                    const newArchive = [parsed, ...(storedArchive ? JSON.parse(storedArchive) : [])];
+                    localStorage.setItem("arrows_story_archive", JSON.stringify(newArchive));
+                    setArchive(newArchive);
+
+                    // Deactivate current
+                    localStorage.removeItem("arrows_story_data");
+                    setActiveStory(null);
+                    setStoryUrl("");
+
+                    toast({ title: "Story Archived", description: "Previous story expired and moved to archive." });
+                }
+            }
+        } catch (e) {
+            console.error("Failed to load story data", e);
+        }
+    }, [toast]);
 
     // Load Projects
-    useState(() => {
+    useEffect(() => {
         const storedProjects = localStorage.getItem("arrows_projects_data");
         if (storedProjects) {
             try {
                 setProjects(JSON.parse(storedProjects));
             } catch (e) {
                 console.error("Failed to parse projects", e);
+                setProjects(defaultProjects);
             }
         } else {
             setProjects(defaultProjects);
         }
-    });
+    }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
         let file: File | undefined;
@@ -336,32 +438,21 @@ export default function Dashboard() {
         }, 1200);
     };
 
-    const isAdmin = user?.email === "arrows.suhail@gmail.com";
 
-    if (!user || !isAdmin) {
-        // If not logged in or not admin, show access denied
-        return (
-            <div className="min-h-screen bg-background text-foreground flex flex-col">
-                <Navbar />
-                <main className="flex-grow flex items-center justify-center p-6 bg-gradient-to-b from-background to-accent/5">
-                    <div className="glass-card p-12 text-center max-w-md animate-fade-up border-rose-500/20">
-                        <FolderLock className="w-16 h-16 text-rose-500 mx-auto mb-6" />
-                        <h1 className="text-3xl font-bold mb-4">{!user ? "Access Denied" : "Admin Only Area"}</h1>
-                        <p className="text-muted-foreground mb-8">
-                            {!user
-                                ? "Please sign in to access the studio administrative tools."
-                                : "This area is reserved for studio administrators. Please return to the homepage."
-                            }
-                        </p>
-                        <Button variant="accent" onClick={() => navigate(!user ? "/login" : "/")} className="w-full">
-                            {!user ? "Sign In" : "Back to Home"}
-                        </Button>
-                    </div>
-                </main>
-                <Footer />
-            </div>
-        );
+
+    // Import UserDashboard lazily or render conditional
+    if (!user) return <Navigate to="/login" replace />; // Basic protection
+
+    if (isLoadingRole) {
+        return <div className="min-h-screen flex items-center justify-center">Loading Workspace...</div>;
     }
+
+    if (!isAdminState) {
+        // Render User Dashboard
+        return <UserDashboard />;
+    }
+
+    // ... Continue rendering Admin Dashboard below ...
 
     const stats = [
         { label: "Active Projects", value: "3", icon: LayoutDashboard, color: "text-blue-500" },
@@ -558,7 +649,7 @@ export default function Dashboard() {
                         <div className="lg:col-span-1 space-y-8">
                             <div className="glass-card p-8 text-center animate-fade-up">
                                 <div className="w-24 h-24 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-6">
-                                    <User className="w-12 h-12 text-accent" />
+                                    <UserIcon className="w-12 h-12 text-accent" />
                                 </div>
                                 <h2 className="text-xl font-bold">{user.email}</h2>
                                 <p className="text-sm text-muted-foreground mt-1 underline">
@@ -779,6 +870,88 @@ export default function Dashboard() {
                                 </div>
                             </div>
 
+                            {/* User Management Section (Admin) */}
+                            <div className="glass-card p-8 animate-fade-up mb-8" style={{ animationDelay: '0.3s' }}>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
+                                        <UserIcon className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold">User Management</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">Control user dashboards and view stats.</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {Object.entries(adminUsers).map(([userId, userData]: [string, any]) => (
+                                        <div key={userId} className="flex items-center justify-between p-4 rounded-xl bg-background/50 border border-border/10">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold">
+                                                    {userData.email?.[0].toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold">{userData.email}</p>
+                                                    <div className="flex gap-3 text-xs text-muted-foreground">
+                                                        <span>Downloads: {userData.stats?.downloads || 0}</span>
+                                                        <span>Spent: ₹{userData.stats?.spent || 0}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <Button variant="outline" size="sm" onClick={() => {
+                                                setSelectedUser(userId);
+                                                setIsUserSheetOpen(true);
+                                            }}>
+                                                Manage
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    {Object.keys(adminUsers).length === 0 && (
+                                        <p className="text-muted-foreground text-sm text-center py-4">No users found yet.</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* User Edit Sheet */}
+                            <Sheet open={isUserSheetOpen} onOpenChange={setIsUserSheetOpen}>
+                                <SheetContent>
+                                    <SheetHeader>
+                                        <SheetTitle>Manage User</SheetTitle>
+                                        <SheetDescription>Edit user stats and transactions.</SheetDescription>
+                                    </SheetHeader>
+                                    {selectedUser && adminUsers[selectedUser] && (
+                                        <div className="space-y-6 mt-6">
+                                            <div className="space-y-2">
+                                                <Label>Downloads Count</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={adminUsers[selectedUser].stats?.downloads || 0}
+                                                    onChange={(e) => {
+                                                        const newUser = { ...adminUsers[selectedUser] };
+                                                        newUser.stats.downloads = parseInt(e.target.value);
+                                                        setAdminUsers({ ...adminUsers, [selectedUser]: newUser });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Total Spent (₹)</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={adminUsers[selectedUser].stats?.spent || 0}
+                                                    onChange={(e) => {
+                                                        const newUser = { ...adminUsers[selectedUser] };
+                                                        newUser.stats.spent = parseInt(e.target.value);
+                                                        setAdminUsers({ ...adminUsers, [selectedUser]: newUser });
+                                                    }}
+                                                />
+                                            </div>
+                                            <Button className="w-full" onClick={() => handleUpdateUser(selectedUser, adminUsers[selectedUser])}>
+                                                Save Changes
+                                            </Button>
+                                        </div>
+                                    )}
+                                </SheetContent>
+                            </Sheet>
+
                             {/* Edit Project Sheet */}
                             <Sheet open={isProjectSheetOpen} onOpenChange={setIsProjectSheetOpen}>
                                 <SheetContent className="overflow-y-auto">
@@ -986,7 +1159,7 @@ export default function Dashboard() {
                                 <div className="glass-card p-8 animate-fade-up border-accent/20 bg-accent/5" style={{ animationDelay: '0.5s' }}>
                                     <div className="flex items-center gap-3 mb-8">
                                         <div className="p-2 rounded-lg bg-accent/10 text-accent">
-                                            <User className="w-5 h-5" />
+                                            <UserIcon className="w-5 h-5" />
                                         </div>
                                         <div>
                                             <h3 className="text-2xl font-bold">User Management</h3>

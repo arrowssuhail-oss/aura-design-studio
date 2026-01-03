@@ -1,0 +1,26 @@
+{
+  "users": {
+    "user_test_123": {
+      "email": "client@example.com",
+      "role": "user",
+      "stats": {
+        "downloads": 20,
+        "spent": 4500
+      },
+      "transactions": [
+        {
+          "paymentId": "pay_123456",
+          "amount": 1500,
+          "description": "Graphic Design Bundle",
+          "date": "2025-12-28"
+        }
+      ],
+      "downloads": [
+        {
+          "name": "Design Assets Pack 1",
+          "date": "2025-12-28"
+        }
+      ]
+    }
+  }
+}
