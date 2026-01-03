@@ -3,6 +3,7 @@ import { useUser, useClerk } from "@clerk/clerk-react";
 // import GoogleAuthSimulation from "@/components/GoogleAuthSimulation";
 
 interface User {
+    id: string;
     email: string;
     name?: string;
 }
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Map Clerk user to our User interface
     const user: User | null = clerkUser ? {
+        id: clerkUser.id,
         email: clerkUser.primaryEmailAddress?.emailAddress || "",
         name: clerkUser.fullName || clerkUser.firstName || "User",
     } : null;
