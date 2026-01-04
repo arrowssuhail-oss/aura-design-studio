@@ -1,0 +1,155 @@
+.ghost-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #212121;
+    overflow: hidden;
+    position: relative;
+}
+
+.switch-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#boo {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    position: absolute;
+    top: -50px;
+}
+
+#boo.show {
+    opacity: 1;
+    animation: float 2s infinite ease-in-out;
+}
+
+#boo.hide {
+    opacity: 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 44px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #3b3b3b;
+    transition: .4s;
+    border-radius: 34px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.slider:before {
+    /* This would be the standard circle, but we use a custom ghost div */
+    content: "";
+    display: none;
+}
+
+/* The Ghost Container (The Knob) */
+.slider>div {
+    position: absolute;
+    height: 36px;
+    width: 36px;
+    left: 4px;
+    bottom: 4px;
+    background-color: transparent;
+    transition: .4s;
+    z-index: 2;
+}
+
+input:checked+.slider>div {
+    transform: translateX(36px);
+}
+
+input:checked+.slider {
+    background-color: #5d3fd3;
+    /* Purple accent */
+}
+
+/* The Ghost Shape */
+.ghost {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    background: #fff;
+    border-radius: 18px 18px 10px 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.ghost:before,
+.ghost:after {
+    content: "";
+    position: absolute;
+    background: #000;
+    height: 4px;
+    width: 4px;
+    border-radius: 50%;
+    top: 12px;
+    z-index: 3;
+}
+
+.ghost:before {
+    left: 10px;
+}
+
+.ghost:after {
+    right: 10px;
+}
+
+/* Ghost Mouth */
+.ghost .mouth {
+    position: absolute;
+    bottom: 10px;
+    left: 16px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #000;
+    display: none;
+    /* Only show when active? or maybe simpler */
+}
+
+/* Active State for Ghost (Eyes Change?) */
+input:checked+.slider>div .ghost {
+    /* Maybe simple tilt */
+    transform: rotate(10deg);
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

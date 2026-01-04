@@ -16,6 +16,9 @@ import VideoEditing from "@/pages/projects/videoediting";
 import Dashboard from "@/pages/Dashboard";
 import Payments from "@/pages/Payments";
 import Legal from "@/pages/Legal";
+import UnderDevelopment from "@/pages/UnderDevelopment";
+import Game from "@/pages/Game";
+import Ghost from "@/pages/Ghost";
 import { AuthProvider } from "@/context/AuthContext";
 import ChatBot from "@/components/ChatBot";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -75,8 +78,10 @@ const App = () => (
         <BrowserRouter>
           <ScrollToAnchor />
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<RedirectToSignIn />} />
+            <Route path="/" element={<UnderDevelopment />} />
+            <Route path="/game" element={<Game />} />
+            <Route path="/ghost" element={<Ghost />} />
+            {/* <Route path="/login" element={<RedirectToSignIn />} />
             <Route path="/signup" element={<RedirectToSignUp />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/payments" element={<Payments />} />
@@ -85,7 +90,7 @@ const App = () => (
             <Route path="/projects/ui-ux-design" element={<HumanCenteredDesign />} />
             <Route path="/projects/identity" element={<Identity />} />
             <Route path="/projects/webdesign" element={<WebDesign />} />
-            <Route path="/projects/video-editing" element={<VideoEditing />} />
+            <Route path="/projects/video-editing" element={<VideoEditing />} /> */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
