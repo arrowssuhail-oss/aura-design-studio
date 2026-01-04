@@ -1,51 +1,225 @@
-.page_404 {
-    padding: 40px 0;
-    background: #fff;
-    font-family: "Arvo", serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.page_404 img {
+.not-found-wrapper {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #daddf5 0%, #ffffff 100%);
+    /* Soft purple/blue tint */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
     width: 100%;
 }
 
-.four_zero_four_bg {
-    background-image: url('/bg.gif');
-    height: 400px;
-    background-position: center;
-    background-repeat: no-repeat;
+.container-404 {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    width: 90%;
+    z-index: 2;
 }
 
-.four_zero_four_bg h1 {
-    font-size: 80px;
+/* The giant 404 in the background */
+.bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    font-size: 45rem;
+    /* Even Bigger to span wide */
+    font-weight: 900;
+    color: #ffffff;
+    z-index: -1;
+    margin: 0;
+    line-height: 1;
+    pointer-events: none;
+    letter-spacing: -20px;
+    /* Tighter letter spacing */
+}
+
+.character-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    /* Push monster towards center right of its box to overlap 404 correctly */
+    padding-right: 50px;
+    z-index: 2;
+    transform: translate(var(--mouse-x, 0px), var(--mouse-y, 0px));
+    transition: transform 0.2s ease-out;
+}
+
+.floating-monster {
+    width: 180%;
+    /* Even bigger */
+    max-width: none;
+    min-width: 800px;
+    /* Massive */
+    margin-left: -40%;
+    /* Pull it back left to center/overlap */
+    /* This creates the constant breathing/bobbing effect */
+    animation: float-antigravity 6s ease-in-out infinite;
+}
+
+.content {
+    flex: 1;
+    position: relative;
+    z-index: 3;
+    padding-left: 20px;
+    text-align: right;
+    /* Changed to right align to match button position? No wait, text is left aligned in block but block is right */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    /* Ensure text starts from left */
+}
+
+.button-row {
+    display: flex;
+    justify-content: flex-end;
+    /* Button floats to the right of the text block */
+    width: 100%;
+    margin-bottom: 30px;
+    transform: translateX(20px);
+    /* Push it slightly more right to hang off edge like design */
+}
+
+.not-found-wrapper h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #000;
+    margin-bottom: 15px;
+}
+
+.not-found-wrapper p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    max-width: 450px;
+    line-height: 1.6;
     margin: 0;
 }
 
-.four_zero_four_bg h3 {
-    font-size: 80px;
+/* The "Return to Base Camp" button */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    color: #333;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.link_404 {
-    color: #fff !important;
-    padding: 10px 20px;
-    background: #39ac31;
-    margin: 20px 0;
-    display: inline-block;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: 0.3s ease;
-}
-
-.link_404:hover {
-    background: #2d8a26;
-    text-decoration: none;
+.back-btn span {
+    background: #4a4e69;
+    /* Dark circle for arrow */
     color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
 }
 
-.contant_box_404 {
-    margin-top: -50px;
-    text-align: center;
+.back-btn:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Keyframes for the floating effect */
+@keyframes float-antigravity {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Particles */
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    z-index: 1;
+    animation: drift var(--speed) linear infinite alternate;
+}
+
+@keyframes drift {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(40px, -60px);
+    }
+}
+
+/* Responsiveness */
+@media (max-width: 900px) {
+    .container-404 {
+        flex-direction: column;
+        padding-top: 50px;
+    }
+
+    .bg-text {
+        font-size: 18rem;
+        top: 20%;
+        transform: translate(-50%, -50%);
+    }
+
+    .content {
+        padding-left: 0;
+        text-align: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .character-wrapper {
+        margin-bottom: 20px;
+    }
+
+    .floating-monster {
+        max-width: 300px;
+    }
+
+    .button-row {
+        justify-content: center;
+    }
 }
