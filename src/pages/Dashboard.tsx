@@ -164,11 +164,26 @@ export default function Dashboard() {
     // Load initial story state & Archive
     useEffect(() => {
         try {
-            // Load Archive
-            const storedArchive = localStorage.getItem("arrows_story_archive");
-            if (storedArchive) {
-                setArchive(JSON.parse(storedArchive));
-            }
+            // Load Archive (Try JSON first, fallback to localStorage)
+            const loadArchive = async () => {
+                try {
+                    const response = await import("@/data/archive.json");
+                    if (response.stories && response.stories.length > 0) {
+                        setArchive(response.stories);
+                        // Update local storage to match remote
+                        localStorage.setItem("arrows_story_archive", JSON.stringify(response.stories));
+                    } else {
+                        // Fallback to local
+                        const storedArchive = localStorage.getItem("arrows_story_archive");
+                        if (storedArchive) setArchive(JSON.parse(storedArchive));
+                    }
+                } catch (e) {
+                    // Fallback to local
+                    const storedArchive = localStorage.getItem("arrows_story_archive");
+                    if (storedArchive) setArchive(JSON.parse(storedArchive));
+                }
+            };
+            loadArchive();
 
             // Load Active Story
             const stored = localStorage.getItem("arrows_story_data");
@@ -183,7 +198,8 @@ export default function Dashboard() {
                     setStoryUrl(parsed.content);
                 } else if (parsed.active && isExpired) {
                     // Move to archive
-                    const newArchive = [parsed, ...(storedArchive ? JSON.parse(storedArchive) : [])];
+                    const currentArchiveStr = localStorage.getItem("arrows_story_archive");
+                    const newArchive = [parsed, ...(currentArchiveStr ? JSON.parse(currentArchiveStr) : [])];
                     localStorage.setItem("arrows_story_archive", JSON.stringify(newArchive));
                     setArchive(newArchive);
 
@@ -282,19 +298,31 @@ export default function Dashboard() {
         }
     };
 
-    const handleArchiveStory = () => {
+    const handleArchiveStory = async () => {
         if (!activeStory) return;
 
         const newArchive = [activeStory, ...archive];
         setArchive(newArchive);
-        localStorage.setItem("arrows_story_archive", JSON.stringify(newArchive));
 
-        // Clear active story without deleting distinct properties if I were to keep them, but here we just clear.
+        // Local Persistence
+        localStorage.setItem("arrows_story_archive", JSON.stringify(newArchive));
         localStorage.removeItem("arrows_story_data");
         setActiveStory(null);
         setStoryUrl("");
 
-        toast({ title: "Story Archived", description: "Story moved to archive." });
+        // GitHub Sync
+        toast({ title: "Archiving...", description: "Syncing archive to GitHub." });
+        try {
+            await fetch('http://localhost:3001/api/sync-github', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: { stories: newArchive }, pageId: 'archive' })
+            });
+            toast({ title: "Story Archived", description: "Moved to archive and synced." });
+        } catch (error) {
+            console.error("Archive sync failed", error);
+            toast({ title: "Archive Local Only", description: "Failed to sync to GitHub.", variant: "destructive" });
+        }
     };
 
     const handleDeleteStory = () => {

@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { RedirectToSignIn, RedirectToSignUp } from "@clerk/clerk-react";
 import Index from "@/pages/Index";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/NotFound";
@@ -11,8 +12,7 @@ import HumanCenteredDesign from "@/pages/projects/ux design";
 import Identity from "@/pages/projects/graphicdesign";
 import WebDesign from "@/pages/projects/webdesign";
 import VideoEditing from "@/pages/projects/videoediting";
-import Login from "@/pages/Login";
-import Signup from "@/pages/Signup";
+
 import Dashboard from "@/pages/Dashboard";
 import Payments from "@/pages/Payments";
 import Legal from "@/pages/Legal";
@@ -76,8 +76,8 @@ const App = () => (
           <ScrollToAnchor />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<RedirectToSignIn />} />
+            <Route path="/signup" element={<RedirectToSignUp />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/legal" element={<Legal />} />
