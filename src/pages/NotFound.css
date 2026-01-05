@@ -52,24 +52,21 @@ html {
 .character-wrapper {
     flex: 1;
     display: flex;
-    justify-content: flex-end;
-    /* Push monster towards center right of its box to overlap 404 correctly */
-    padding-right: 50px;
+    justify-content: center;
+    align-items: center;
+    padding-right: 0;
     z-index: 2;
     transform: translate(var(--mouse-x, 0px), var(--mouse-y, 0px));
     transition: transform 0.2s ease-out;
 }
 
 .floating-monster {
-    width: 180%;
-    /* Even bigger */
+    width: 65%;
     max-width: none;
-    min-width: 800px;
-    /* Massive */
-    margin-left: -40%;
-    /* Pull it back left to center/overlap */
+    min-width: 200px;
+    margin-left: -20%;
     /* This creates the constant breathing/bobbing effect */
-    animation: float-antigravity 6s ease-in-out infinite;
+    /* animation: float-antigravity 6s ease-in-out infinite; */
 }
 
 .content {
