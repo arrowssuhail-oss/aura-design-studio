@@ -23,8 +23,8 @@ export const defaultProjects = [
     iconName: "Palette",
     shapes: ["rounded-full", "rounded-lg", "rounded-full"],
     link: "/projects/identity",
-    image: "/projects/graphic-design/slide1.png",
-    images: ["/projects/graphic-design/slide1.png", "/projects/graphic-design/slide2.png"],
+    // image: "/projects/graphic-design/slide1.png",
+    // images: ["/projects/graphic-design/slide1.png", "/projects/graphic-design/slide2.png"],
   },
   {
     id: 2,
@@ -176,7 +176,7 @@ const ProjectCard = ({ project }: { project: any }) => {
             {project.category}
           </span>
           <div className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-            <ArrowUpRight className="w-5 h-5 text-black" />
+            <ArrowUpRight className="w-5 h-5 text-foreground" />
           </div>
         </div>
 
@@ -205,7 +205,9 @@ const ProjectCard = ({ project }: { project: any }) => {
 const ProjectsSection = () => {
   const [projects, setProjects] = useState<any[]>(() => {
     const stored = localStorage.getItem("arrows_projects_data");
-    return stored ? JSON.parse(stored) : defaultProjects;
+    const data = stored ? JSON.parse(stored) : defaultProjects;
+    // Deduplicate by ID
+    return data.filter((v: any, i: number, a: any[]) => a.findIndex((v2: any) => v2.id === v.id) === i);
   });
 
   useEffect(() => {
@@ -239,7 +241,9 @@ const ProjectsSection = () => {
             return project;
           })
         );
-        setProjects(updatedProjects);
+        // Deduplicate again just in case
+        const uniqueProjects = updatedProjects.filter((v: any, i: number, a: any[]) => a.findIndex((v2: any) => v2.id === v.id) === i);
+        setProjects(uniqueProjects);
       } catch (error) {
         console.error("Failed to load project images:", error);
       }
@@ -251,7 +255,9 @@ const ProjectsSection = () => {
     const handleUpdate = () => {
       const stored = localStorage.getItem("arrows_projects_data");
       if (stored) {
-        setProjects(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        const unique = parsed.filter((v: any, i: number, a: any[]) => a.findIndex((v2: any) => v2.id === v.id) === i);
+        setProjects(unique);
       }
       loadProjectImages();
     };

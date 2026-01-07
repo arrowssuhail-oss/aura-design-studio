@@ -26,7 +26,7 @@ const HeroSection = () => {
         className="text-xl md:text-2xl text-muted-foreground font-light mb-8 animate-fade-up"
         style={{ animationDelay: "0.3s" }}
       >
-        Designer + Creator — Crafting minimal, meaningful designs
+        Designer + Creator — Crafting Minimal, Meaningful Designs
       </p>
 
       <div
